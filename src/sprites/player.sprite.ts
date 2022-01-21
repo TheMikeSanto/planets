@@ -10,6 +10,15 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.setScale(0.5);
   }
 
+  /**
+   * Provides the sprite's center point on x and y
+   *
+   * @return object containing the sprite's center point on x and y axes
+   */
+  public get position(): { x: number, y: number } {
+    return { x: this.x, y: this.y };
+  }
+
   public update(movement): void {
     if (movement.up) {
       this.y -= this.movementRate;

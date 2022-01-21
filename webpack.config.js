@@ -35,7 +35,7 @@ module.exports = {
         { from: 'assets', to: 'assets' },
       ],
     }),
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({ title: 'Planets' }),
     new BrowserSyncPlugin({
       host: 'localhost',
       port: 3000,

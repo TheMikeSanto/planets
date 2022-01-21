@@ -5,8 +5,9 @@ import { PlayerSprite } from '../sprites';
 export class MainScene extends Phaser.Scene {
   private player: PlayerSprite;
   private starField: Phaser.GameObjects.TileSprite;
-  private planetPurple: Phaser.GameObjects.TileSprite;
-  private planetGreen: Phaser.GameObjects.TileSprite;
+  private planets: Phaser.GameObjects.TileSprite[];
+  private trajectory: Phaser.Curves.Path;
+  private graphics: Phaser.GameObjects.Graphics;
 
   constructor () {
     super('mainScene');
@@ -15,14 +16,30 @@ export class MainScene extends Phaser.Scene {
   create () {
     const { height, width } = this.scale;
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
-    this.planetGreen = this.add.tileSprite(600, 20, 1200, 40, 'planet-green');
-    this.planetPurple = this.add.tileSprite(600, height - 20, 1200, 40, 'planet-purple');
+    this.planets = [
+      this.add.tileSprite(600, 20, 1200, 40, 'planet-green'),
+      this.add.tileSprite(600, height - 20, 1200, 40, 'planet-purple'),
+    ]
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
+    this.graphics = this.add.graphics();
+    this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
+  }
+  
+  public update(): void {
+    const scrollFactor = 0.75;
+    this.starField.tilePositionX += scrollFactor / 4;
+    this.planets.forEach(planet => planet.tilePositionX += scrollFactor);
+    this.drawTrajectory();
   }
 
-  public update(): void {
-    this.starField.tilePositionX += 0.1;
-    this.planetPurple.tilePositionX += 1;
-    this.planetGreen.tilePositionX += 1;
+  /**
+   * Draws the player's current trajectory on screen
+   */
+  private drawTrajectory(): void {
+    this.graphics.clear();
+    this.graphics.lineStyle(1, 0xffffff, 0.75);
+    // Figure out gravity, calculate endpoint and decay curve here
+    this.trajectory.lineTo(1200, this.player.position.y);
+    this.trajectory.draw(this.graphics);
   }
 }
