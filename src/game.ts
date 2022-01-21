@@ -4,7 +4,7 @@ import { MainScene, PreloadScene } from './scenes';
 
 export namespace Planets {
   export class Game extends Phaser.Game {
-    private static readonly WIDTH = 800;
+    private static readonly WIDTH = 1200;
     private static readonly HEIGHT = 600;
     private static readonly config = {
       type: Phaser.AUTO,
@@ -13,8 +13,8 @@ export namespace Planets {
         mode: Phaser.Scale.FIT,
         parent: 'content',
         autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 1200,
-        height: 600
+        width: Game.WIDTH,
+        height: Game.HEIGHT,
       }
     };
 
