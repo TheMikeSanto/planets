@@ -6,6 +6,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
 
   constructor(scene: Phaser.Scene, x, y) {
     super(scene, x, y, 'player');
+    scene.physics.add.existing(this);
     scene.add.existing(this);
     this.setScale(0.5);
   }

@@ -15,7 +15,10 @@ export namespace Planets {
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: Game.WIDTH,
         height: Game.HEIGHT,
-      }
+      },
+      physics: {
+        default: 'arcade',
+      },
     };
 
     constructor() {
