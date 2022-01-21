@@ -1,11 +1,14 @@
 import * as Phaser from 'phaser';
 
-import { PlayerSprite } from '../sprites';
+import {
+  PlanetTileSprite,
+  PlayerSprite,
+} from '../sprites';
 
 export class MainScene extends Phaser.Scene {
   private player: PlayerSprite;
   private starField: Phaser.GameObjects.TileSprite;
-  private planets: Phaser.GameObjects.TileSprite[];
+  private planets: PlanetTileSprite[];
   private trajectory: Phaser.Curves.Path;
   private graphics: Phaser.GameObjects.Graphics;
 
@@ -16,16 +19,13 @@ export class MainScene extends Phaser.Scene {
   create () {
     const { height, width } = this.scale;
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
-    // should probably create a planet sprite class
     this.planets = [
-      this.add.tileSprite(600, 20, 1200, 40, 'planet-green'),
-      this.add.tileSprite(600, height - 20, 1200, 40, 'planet-purple'),
+      new PlanetTileSprite(this, 20, 'planet-green'),
+      new PlanetTileSprite(this, height - 20, 'planet-purple'),
     ];
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
     this.physics.world.bounds.height = height - 80;
     this.planets.forEach(planet => {
-      this.physics.add.existing(planet);
-      planet.body['immovable'] = true;
       this.physics.add.collider(this.player, planet, (player, planet) => {
         console.log('collision', planet);
       });
