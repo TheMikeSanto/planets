@@ -48,13 +48,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
     scene.physics.add.existing(this);
     scene.add.existing(this);
     this.setScale(this.scaleFactor);
-    switch (this.sourcePlanet) {
-      case DebrisSource.Bottom:
-        this.setTint(0x8c06a7);
-        break;
-      case DebrisSource.Top:
-        break;
-    }
+    if (this.sourcePlanet === DebrisSource.Bottom) this.setTint(0x2a24ee);
   }
 
   /**
