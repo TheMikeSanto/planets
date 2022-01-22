@@ -36,25 +36,8 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.debris.add(debris);
   }
 
-  public update(movement): void {
-    if (movement.up) {
-      this.y -= this.movementRate;
-    }
-    if (movement.down) {
-      this.y += this.movementRate;
-    }
-    if (movement.left) {
-      this.flipX = true;
-      this.angle = this.movementAngle;
-      this.x -= this.movementRate;
-    }
-    if (movement.right) {
-      this.flipX = false;
-      this.angle = -this.movementAngle;
-      this.x += this.movementRate;
-    }
-    if (!movement.right && !movement.left) {
-      this.angle = 0;
-    }
+  public update(): void {
+    this.body.velocity.y = this.debris.getRelativeMass() * 100;
+    console.log('Velocity: ', this.body.velocity.y);
   }
 }

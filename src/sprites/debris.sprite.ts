@@ -26,11 +26,6 @@ const CONFIG = {
  * @note sprite asset base size is 260x260
  */
 export class DebrisSprite extends Phaser.GameObjects.Sprite {
-  private static readonly ASSET_KEYS: string[] = [
-    'debris-blue',
-    'debris-white',
-  ];
-
   /**The amount the sprite should be scaled relative to the maximum sprite size */
   private scaleFactor = this.determineScaleFactor();
   /** Determines whether object should rotate */
@@ -49,10 +44,17 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
    * @param y vertical position of debris on creation
    */
   constructor(scene: Phaser.Scene, y: number) {
-    super(scene, scene.scale.width + 100, y, _.sample(DebrisSprite.ASSET_KEYS));
+    super(scene, scene.scale.width + 100, y, 'debris-white');
     scene.physics.add.existing(this);
     scene.add.existing(this);
     this.setScale(this.scaleFactor);
+    switch (this.sourcePlanet) {
+      case DebrisSource.Bottom:
+        this.setTint(0x8c06a7);
+        break;
+      case DebrisSource.Top:
+        break;
+    }
   }
 
   /**

@@ -40,11 +40,12 @@ export class MainScene extends Phaser.Scene {
   }
   
   public update(): void {
-    const scrollFactor = 0.75;
+    const scrollFactor = 1;
     this.starField.tilePositionX += scrollFactor / 4;
     this.debrisManager.update();
     this.planets.forEach(planet => planet.tilePositionX += scrollFactor);
     this.drawTrajectory();
+    this.player.update();
   }
 
   /**
