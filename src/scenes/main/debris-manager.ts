@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
 import {
@@ -21,9 +22,10 @@ export class DebrisManager {
    * Begins debris spawning.
    */
   public start(): void {
+    this.spawnDebris(4);
     this.scene.time.addEvent({
       callback: () => this.spawnDebris(3),
-      delay: 2000,
+      delay: 3000,
       loop: true,
     });
   }
@@ -50,10 +52,31 @@ export class DebrisManager {
    * @param numDebris number of debris objects to spawn
    */
   private spawnDebris(numDebris: number): void {
+    console.log(this.getSegmentsBySize());
     [...Array(numDebris)].map(() => {
       const debris = new DebrisSprite(this.scene, randomInRange(80, 500));
       this.registerPlayerCollider(debris);
       this.debris.push(debris);
     });
+  }
+
+  /**
+   * Determines the percentage of the total population belonging to each segment of
+   * debris ordered by size.
+   *
+   * @returns breakdown of percentages of each segment
+   */
+  private getSegmentsBySize(): { small: number, medium: number, large: number } {
+    const limits = { small: 0.33, medium: 0.66, large: 1 }
+    const total = this.debris.length;
+    const small = _.filter(this.debris, debris => debris.size <= limits.small)
+      .length / total;
+    const medium = _.filter(this.debris,
+      debris => debris.size > limits.small && debris.size <= limits.medium)
+      .length / total;
+    const large = _.filter(this.debris,
+      debris => debris.size > limits.medium && debris.size <= limits.large)
+      .length / total;
+    return { small, medium, large };
   }
 }
