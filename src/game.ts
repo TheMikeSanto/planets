@@ -8,7 +8,7 @@ export namespace Planets {
     private static readonly HEIGHT = 600;
     private static readonly config = {
       type: Phaser.AUTO,
-      backgroundColor: ' #DFFFFD',
+      backgroundColor: ' #000000',
       scale: {
         mode: Phaser.Scale.FIT,
         parent: 'content',

@@ -16,7 +16,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
   ]);
 
   constructor(scene: Phaser.Scene, y: number) {
-    super(scene, scene.scale.width + 100, y, 'debris');
+    super(scene, scene.scale.width + 100, y, _.sample(['debris-blue', 'debris-white']));
     scene.physics.add.existing(this);
     scene.add.existing(this);
     this.setScale(this.scaleFactor);

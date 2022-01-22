@@ -24,7 +24,7 @@ export class DebrisManager {
   public start(): void {
     this.spawnDebris(4);
     this.scene.time.addEvent({
-      callback: () => this.spawnDebris(3),
+      callback: () => this.spawnDebris(1),
       delay: 3000,
       loop: true,
     });
