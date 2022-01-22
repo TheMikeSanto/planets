@@ -1,11 +1,16 @@
 {
 	"compilerOptions": {
+		"baseUrl": ".",
 		"target": "es6",
 		"module": "es6",
 		"moduleResolution": "node",
 		"outDir": "./dist/",
 		"sourceMap": true,
 		"esModuleInterop": true,
-		"allowSyntheticDefaultImports": true
+		"allowSyntheticDefaultImports": true,
+		"paths": {
+			"@sprites/*": ["src/sprites/*"],
+			"@utils/*": ["src/utils/*"]
+		}
 	},
 }

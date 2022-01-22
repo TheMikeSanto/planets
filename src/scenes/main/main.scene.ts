@@ -1,11 +1,14 @@
 import * as Phaser from 'phaser';
 
+import { DebrisManager } from './debris-manager';
+
 import {
   PlanetTileSprite,
   PlayerSprite,
-} from '../sprites';
+} from '../../sprites';
 
 export class MainScene extends Phaser.Scene {
+  private debrisManager: DebrisManager;
   private player: PlayerSprite;
   private starField: Phaser.GameObjects.TileSprite;
   private planets: PlanetTileSprite[];
@@ -24,19 +27,22 @@ export class MainScene extends Phaser.Scene {
       new PlanetTileSprite(this, height - 20, 'planet-purple'),
     ];
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
-    this.physics.world.bounds.height = height - 80;
-    this.planets.forEach(planet => {
-      this.physics.add.collider(this.player, planet, (player, planet) => {
-        console.log('collision', planet);
+    this.planets.forEach(body => {
+      this.physics.add.collider(this.player, body, (player, body) => {
+        console.log('collision', body);
       });
     });
+    this.physics.world.bounds.height = height - 80;
     this.graphics = this.add.graphics();
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
+    this.debrisManager = new DebrisManager(this, this.player);
+    this.debrisManager.start();
   }
   
   public update(): void {
     const scrollFactor = 0.75;
     this.starField.tilePositionX += scrollFactor / 4;
+    this.debrisManager.update();
     this.planets.forEach(planet => planet.tilePositionX += scrollFactor);
     this.drawTrajectory();
   }
@@ -60,6 +66,12 @@ export class MainScene extends Phaser.Scene {
     this.trajectory.draw(this.graphics);
   }
 
+  /**
+   * Determines if the given key is currently pressed.
+   *
+   * @param key
+   * @returns `true` if key is pressed, `false` otherwise
+   */
   private isPressed(key: string): boolean {
     return this.input.keyboard.addKey(key).isDown;
   }

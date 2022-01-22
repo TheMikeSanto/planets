@@ -11,6 +11,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('planet-purple', 'assets/planet-purple.png');
     this.load.image('planet-green', 'assets/planet-green.png');
     this.load.image('starfield', 'assets/starfield.jpg');
+    this.load.image('debris', 'assets/debris.png');
     this.load.on('complete', () => {
       console.log('complete');
       this.scene.start('mainScene');
