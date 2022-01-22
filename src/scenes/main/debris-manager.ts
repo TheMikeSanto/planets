@@ -9,6 +9,7 @@ import { randomInRange } from '../../utils';
 
 /** Manages all of the debris for the entire game state */
 export class DebrisManager {
+  private barrier: Phaser.GameObjects.Sprite;
   private debris: DebrisSprite[] = [];
   private player: PlayerSprite;
   private scene: Phaser.Scene;
@@ -16,6 +17,8 @@ export class DebrisManager {
   constructor(scene: Phaser.Scene, player: PlayerSprite) {
     this.scene = scene;
     this.player = player;
+    this.barrier = this.scene.add.sprite(-100, 0, 'barrier');
+    this.scene.physics.add.existing(this.barrier);
   }
 
   /**
@@ -40,9 +43,14 @@ export class DebrisManager {
    *
    * @param body body to be registered as a collider
    */
-  private registerPlayerCollider(body: Phaser.GameObjects.Sprite): void {
-    this.scene.physics.add.collider(this.player, body, (player, body) => {
-      console.log('collision', body);
+  private registerColliders(debris: DebrisSprite): void {
+    this.scene.physics.add.collider(this.player, debris, (player, body) => {
+      // console.log('collision', body);
+    });
+    this.scene.physics.add.collider(this.barrier, debris, (barrier, body) => {
+      const index = this.debris.indexOf(debris);
+      if (index) this.debris.splice(index, 1);
+      debris.destroy();
     });
   }
 
@@ -55,7 +63,7 @@ export class DebrisManager {
     console.log(this.getSegmentsBySize());
     [...Array(numDebris)].map(() => {
       const debris = new DebrisSprite(this.scene, randomInRange(80, 500));
-      this.registerPlayerCollider(debris);
+      this.registerColliders(debris);
       this.debris.push(debris);
     });
   }

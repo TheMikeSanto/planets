@@ -9,7 +9,7 @@ enum SpinDirection {
 }
 export class DebrisSprite extends Phaser.GameObjects.Sprite {
   private scaleFactor = Math.random();
-  private shouldRotate = false;
+  private shouldRotate = _.sample([true, false]);
   private readonly spinDirection = _.sample([
     SpinDirection.Clockwise,
     SpinDirection.Counterclockwise
@@ -41,23 +41,15 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
   }
 
   private rotate(): void {
-    const rotationFactor = (1 - this.scaleFactor);
+    const rotationFactor = (1 - this.scaleFactor) / 500;
 
-    const angle = (() => {
-      switch (this.spinDirection) {
-        case SpinDirection.Clockwise: 
-          return this.angle < 360
-            ? this.angle + rotationFactor
-            : 0;
-        case SpinDirection.Counterclockwise:
-          return this.angle > 0
-            ? this.angle - rotationFactor
-            : 360;
-      }
-    })();
-    if (this.spinDirection === SpinDirection.Counterclockwise) {
-      console.log('new angle', angle, this.angle, rotationFactor);
+    switch (this.spinDirection) {
+      case SpinDirection.Clockwise:
+        this.rotation += rotationFactor;
+        break;
+      case SpinDirection.Counterclockwise:
+        this.rotation -= rotationFactor;
+        break;
     }
-    this.setAngle(angle);
   }
 }
