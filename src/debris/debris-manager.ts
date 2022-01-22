@@ -47,19 +47,30 @@ export class DebrisManager {
   }
 
   /**
+   * Removes the given debris from the debris array and destroyts it.
+   *
+   * @param debris debris to be destroyed/removed
+   */
+  private destroy(debris: DebrisSprite): void {
+    const index = this.debris.indexOf(debris);
+    if (index) this.debris.splice(index, 1);
+    debris.destroy();
+  }
+
+  /**
    * Takes the given object and registers a physics collider between the object and the player
    * sprite
    *
    * @param body body to be registered as a collider
    */
   private registerColliders(debris: DebrisSprite): void {
-    this.scene.physics.add.collider(this.player, debris, (player, body) => {
-      // console.log('collision', body);
+    const playerCollider = this.scene.physics.add.collider(this.player, debris, (player, body) => {
+      playerCollider.destroy();
+      this.player.collectDebris(debris.collectionData);
+      this.destroy(debris);
     });
     this.scene.physics.add.collider(this.barrier, debris, (barrier, body) => {
-      const index = this.debris.indexOf(debris);
-      if (index) this.debris.splice(index, 1);
-      debris.destroy();
+      this.destroy(debris);
     });
   }
 
@@ -84,7 +95,7 @@ export class DebrisManager {
    * @returns breakdown of percentages of each segment
    */
   private getSegmentsBySize(): { small: number, medium: number, large: number } {
-    const limits = { small: 0.33, medium: 0.66, large: 1 }
+    const limits = { small: 0.09, medium: 0.17, large: 0.25 }
     const total = this.debris.length;
     const small = _.filter(this.debris, debris => debris.size <= limits.small)
       .length / total;

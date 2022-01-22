@@ -1,11 +1,16 @@
 import * as Phaser from 'phaser';
 
-import { DebrisSprite } from './debris.sprite';
+import {
+  CollectedDebris,
+  DebrisCollection,
+} from '../debris';
+import {DebrisSprite } from './debris.sprite';
 
 export class PlayerSprite extends Phaser.GameObjects.Sprite {
   private readonly movementRate = 2;
   private readonly movementAngle = 5;
-  private debrisCollection = [];
+  private readonly debris: DebrisCollection = new DebrisCollection();
+
   constructor(scene: Phaser.Scene, x, y) {
     super(scene, x, y, 'player');
     scene.physics.add.existing(this);
@@ -22,8 +27,13 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     return { x: this.x, y: this.y };
   }
 
-  public addDebris(debris: DebrisSprite): void {
-    this.debrisCollection.push(debris);
+  /**
+   * Adds the given debris to the player's debris collection.
+   *
+   * @param debris debris to be collected
+   */
+  public collectDebris(debris: CollectedDebris): void {
+    this.debris.add(debris);
   }
 
   public update(movement): void {

@@ -1,7 +1,14 @@
 import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
-import { randomInRange } from '../utils';
+import {
+  CollectedDebris,
+  DebrisSource
+} from '../debris';
+import {
+  randomEnum,
+  randomInRange,
+} from '../utils';
 
 enum SpinDirection {
   Clockwise,
@@ -23,18 +30,41 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
     'debris-blue',
     'debris-white',
   ];
-  private scaleFactor = this.determineScaleFactor();
-  private shouldRotate = _.sample([true, false]);
-  private readonly spinDirection = _.sample([
-    SpinDirection.Clockwise,
-    SpinDirection.Counterclockwise
-  ]);
 
+  /**The amount the sprite should be scaled relative to the maximum sprite size */
+  private scaleFactor = this.determineScaleFactor();
+  /** Determines whether object should rotate */
+  private readonly shouldRotate = _.sample([true, false]);
+  /** Determines which planet the debris belongs to */
+  private readonly sourcePlanet = randomEnum(DebrisSource);
+  /** Object's spin direction */
+  private readonly spinDirection = this.shouldRotate
+    ? randomEnum(SpinDirection)
+    : undefined;
+
+  /**
+   * Constructor.
+   *
+   * @param scene scene the debris will be added to
+   * @param y vertical position of debris on creation
+   */
   constructor(scene: Phaser.Scene, y: number) {
     super(scene, scene.scale.width + 100, y, _.sample(DebrisSprite.ASSET_KEYS));
     scene.physics.add.existing(this);
     scene.add.existing(this);
     this.setScale(this.scaleFactor);
+  }
+
+  /**
+   * Generates a debris collection object.
+   *
+   * @return debris collection data
+   */
+  public get collectionData(): CollectedDebris {
+    return {
+      sourcePlanet: this.sourcePlanet,
+      mass: this.scaleFactor,
+    }
   }
 
   /**
