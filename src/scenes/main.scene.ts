@@ -1,11 +1,11 @@
 import * as Phaser from 'phaser';
 
-import { DebrisManager } from './debris-manager';
+import { DebrisManager } from '../debris';
 
 import {
   PlanetTileSprite,
   PlayerSprite,
-} from '../../sprites';
+} from '../sprites';
 
 export class MainScene extends Phaser.Scene {
   private debrisManager: DebrisManager;

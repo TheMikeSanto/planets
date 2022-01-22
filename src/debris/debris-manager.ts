@@ -4,8 +4,8 @@ import * as Phaser from 'phaser';
 import {
   DebrisSprite,
   PlayerSprite
-} from '../../sprites';
-import { randomInRange } from '../../utils';
+} from '../sprites';
+import { randomInRange } from '../utils';
 
 const CONFIG = {
   /** Time in ms between spawn events */
