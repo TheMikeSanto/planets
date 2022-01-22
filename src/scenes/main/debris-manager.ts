@@ -7,6 +7,15 @@ import {
 } from '../../sprites';
 import { randomInRange } from '../../utils';
 
+const CONFIG = {
+  /** Time in ms between spawn events */
+  spawnRate: 3000,
+  /** Number of objects to spawn on startup */
+  numDebrisOnStart: 10,
+  /** Number of objects to spawn per interval */
+  numDebrisPerInterval: 10,
+} as const;
+
 /** Manages all of the debris for the entire game state */
 export class DebrisManager {
   private barrier: Phaser.GameObjects.Sprite;
@@ -25,10 +34,10 @@ export class DebrisManager {
    * Begins debris spawning.
    */
   public start(): void {
-    this.spawnDebris(4);
+    this.spawnDebris(CONFIG.numDebrisOnStart);
     this.scene.time.addEvent({
-      callback: () => this.spawnDebris(1),
-      delay: 3000,
+      callback: () => this.spawnDebris(CONFIG.numDebrisPerInterval),
+      delay: CONFIG.spawnRate,
       loop: true,
     });
   }

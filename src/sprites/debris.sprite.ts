@@ -7,8 +7,23 @@ enum SpinDirection {
   Clockwise,
   Counterclockwise,
 }
+
+const CONFIG = {
+  /** Minimum scale factor */
+  minScaleFactor: 0.25,
+} as const;
+
+/**
+ * Class representing a debris object.
+ *
+ * @note sprite asset base size is 260x260
+ */
 export class DebrisSprite extends Phaser.GameObjects.Sprite {
-  private scaleFactor = Math.random();
+  private static readonly ASSET_KEYS: string[] = [
+    'debris-blue',
+    'debris-white',
+  ];
+  private scaleFactor = this.determineScaleFactor();
   private shouldRotate = _.sample([true, false]);
   private readonly spinDirection = _.sample([
     SpinDirection.Clockwise,
@@ -16,7 +31,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
   ]);
 
   constructor(scene: Phaser.Scene, y: number) {
-    super(scene, scene.scale.width + 100, y, _.sample(['debris-blue', 'debris-white']));
+    super(scene, scene.scale.width + 100, y, _.sample(DebrisSprite.ASSET_KEYS));
     scene.physics.add.existing(this);
     scene.add.existing(this);
     this.setScale(this.scaleFactor);
@@ -31,6 +46,9 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
     return { x: this.x, y: this.y };
   }
 
+  /**
+   * Returns the debris' [[scaleFactor]]
+   */
   public get size(): number {
     return this.scaleFactor;
   }
@@ -40,6 +58,19 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
     this.setX(this.position.x -(1 - this.scaleFactor));
   }
 
+  /**
+   * Generates a pseudorandom number to be used to determine the debris' scale.
+   *
+   * @returns generated scale factor
+   */
+  private determineScaleFactor(): number {
+    const scaleFactor = Math.random() / randomInRange(2, 5);
+    return Math.min(scaleFactor, CONFIG.minScaleFactor);
+  }
+
+  /**
+   * Rotates the sprite clockwise or counterclockwise according to its [[SpinDirection]]
+   */
   private rotate(): void {
     const rotationFactor = (1 - this.scaleFactor) / 500;
 
