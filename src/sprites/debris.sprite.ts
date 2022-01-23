@@ -19,7 +19,7 @@ enum SpinDirection {
 
 const CONFIG = {
   /** Minimum scale factor */
-  minScaleFactor: 0.25,
+  minScaleFactor: 0.1,
 } as const;
 
 /**
@@ -51,7 +51,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
    */
   constructor(scene: Phaser.Scene,y: number, type = DebrisType.Default,
     source = randomEnum(DebrisSource)) {
-    super(scene, scene.scale.width + 100, y, _.sample(ASSET_KEYS[type]));
+    super(scene, scene.scale.width + 100 + randomInRange(0, 75), y, _.sample(ASSET_KEYS[type]));
     this.debrisSource = source;
     this.debrisType = type;
     scene.physics.add.existing(this);

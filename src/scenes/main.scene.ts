@@ -11,6 +11,7 @@ export class MainScene extends Phaser.Scene {
   private debrisManager: DebrisManager;
   private player: PlayerSprite;
   private starField: Phaser.GameObjects.TileSprite;
+  private cloudLayer: Phaser.GameObjects.TileSprite;
   private planets: PlanetTileSprite[];
   private trajectory: Phaser.Curves.Path;
   private graphics: Phaser.GameObjects.Graphics;
@@ -22,6 +23,7 @@ export class MainScene extends Phaser.Scene {
   public create(): void {
     const { height, width } = this.scale;
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
+    this.cloudLayer = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'clouds');
     this.planets = [
       new PlanetTileSprite(this, 20, 'planet1'),
       new PlanetTileSprite(this, height - 20, 'planet1'),
@@ -30,8 +32,7 @@ export class MainScene extends Phaser.Scene {
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
     this.planets.forEach(body => {
       this.physics.add.collider(this.player, body, (player, body) => {
-        console.log('collision', body);
-        this.scene.start('gameOverScene');
+        // this.scene.start('gameOverScene');
       });
     });
     this.physics.world.bounds.height = height - 80;
@@ -40,10 +41,11 @@ export class MainScene extends Phaser.Scene {
     this.debrisManager = new DebrisManager(this, this.player);
     this.debrisManager.start();
   }
-  
+
   public update(): void {
     const scrollFactor = 1;
-    this.starField.tilePositionX += scrollFactor / 4;
+    this.starField.tilePositionX += scrollFactor / 5;
+    this.cloudLayer.tilePositionX += scrollFactor / 4;
     this.debrisManager.update();
     this.planets.forEach(planet => planet.tilePositionX += scrollFactor);
     this.drawTrajectory();
