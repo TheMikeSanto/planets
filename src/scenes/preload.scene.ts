@@ -23,6 +23,9 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('planet1', 'assets/planet-white.png');
     this.load.image('planet2', 'assets/planet-purple.png');
     this.load.image('starfield', 'assets/starfield.png');
+    this.load.audio('harp', 'assets/audio/harp.wav');
+    this.load.audio('low-bump', 'assets/audio/low-bump.wav');
+    this.load.audio('plop', 'assets/audio/plop.wav');
     this.load.on('complete', () => {
       console.log('complete');
       this.scene.start('mainScene');

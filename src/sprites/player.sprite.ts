@@ -1,8 +1,10 @@
 import * as Phaser from 'phaser';
 
+import { SETTINGS } from '../settings.config';
 import {
   CollectedDebris,
   DebrisCollection,
+  DebrisSource,
 } from '../debris';
 import {
   ActionType,
@@ -12,6 +14,10 @@ import {
 const ROTATION_SPEED = 1 * Math.PI; // radians/second
 
 export class PlayerSprite extends Phaser.GameObjects.Sprite {
+  private readonly sounds: {
+    collectionBottom: Phaser.Sound.BaseSound,
+    collectionTop: Phaser.Sound.BaseSound,
+  };
   private readonly debris: DebrisCollection = new DebrisCollection();
   private gravCannonAction: ActionType = ActionType.Pull;
   private inFiringCooldown = false;
@@ -31,6 +37,10 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
       if (pointer.leftButtonDown()) this.fireGravityCannon(ActionType.Pull);
     })
     this.scene.input.on('pointerup', pointer => this.stopGravityCannon());
+    this.sounds = {
+      collectionBottom: scene.sound.add('low-bump'),
+      collectionTop: scene.sound.add('plop'),
+    }
   }
 
   /**
@@ -52,12 +62,14 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   }
 
   /**
-   * Adds the given debris to the player's debris collection.
+   * Adds the given debris to the player's debris collection and triggers associated
+   * audio/animations.
    *
    * @param debris debris to be collected
    */
   public collectDebris(debris: CollectedDebris): void {
     this.debris.add(debris);
+    this.maybePlayCollectionAudio(debris.source);
   }
 
   /** Fires the Gravity Cannon (if it is not in cooldown)
@@ -104,5 +116,18 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
       });
       this.projectileGroup.add(projectile);
     }
+  }
+
+  /**
+   * Plays collection audio for the given debris source if audio is not disabled by global
+   * setting.
+   *
+   * @param source source of debris that was collected
+   */
+  private maybePlayCollectionAudio(source: DebrisSource): void {
+    if (SETTINGS.disableAudio) return;
+    (source === DebrisSource.Bottom 
+      ? this.sounds.collectionBottom
+      : this.sounds.collectionTop).play();
   }
 }

@@ -4,8 +4,10 @@ export const SETTINGS = {
   debug: true,
   /** Affects the base scroll rate/debris spawn rate */
   gameSpeed: 1,
-  /** Enables the game over scene */
-  disableFailure: false,
+  /** Disables audio */
+  disableAudio: true,
+  /** Disables the failure state */
+  disableFailure: true,
   /** Settings to control the behavior of the gravity gun */
   gravityGun: {
     aoeDistance: 10,
