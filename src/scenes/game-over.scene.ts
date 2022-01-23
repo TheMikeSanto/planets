@@ -3,6 +3,7 @@ import * as Phaser from 'phaser';
 export class GameOverScene extends Phaser.Scene {
   private background: Phaser.GameObjects.TileSprite;
   private text;
+
   constructor() {
     super('gameOverScene');
   }
@@ -13,10 +14,15 @@ export class GameOverScene extends Phaser.Scene {
     const midpointY = height * 0.5;
     this.background = this.add.tileSprite(midpointX, midpointY, 1200, 600,
       'background-game-over');
-    this.text = this.add.text(midpointX, midpointY, 'GAME OVER', {
+    this.text = this.add.text(midpointX - 25, midpointY, 'GAME OVER');
+    this.text.setStyle({
       font: 'Arial',
-      fontSize: '120px',
-    })
+      fontSize: '128px',
+    });
+    this.time.addEvent({
+      callback: () => this.scene.start('mainScene'),
+      delay: 3000,
+    });
   }
 
   public update(): void {
