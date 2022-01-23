@@ -6,7 +6,7 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
-    console.log('load');
+    this.load.image('background-game-over', 'assets/game-over-bg.png');
     this.load.image('barrier', 'assets/barrier.png');
     this.load.image('debris', 'assets/debris.png');
     this.load.image('debris-blue', 'assets/debris-blue.png');

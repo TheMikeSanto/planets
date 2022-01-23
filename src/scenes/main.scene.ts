@@ -19,7 +19,7 @@ export class MainScene extends Phaser.Scene {
     super('mainScene');
   }
   
-  create () {
+  public create(): void {
     const { height, width } = this.scale;
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
     this.planets = [
@@ -31,6 +31,7 @@ export class MainScene extends Phaser.Scene {
     this.planets.forEach(body => {
       this.physics.add.collider(this.player, body, (player, body) => {
         console.log('collision', body);
+        this.scene.start('gameOverScene');
       });
     });
     this.physics.world.bounds.height = height - 80;

@@ -1,6 +1,10 @@
 import * as Phaser from 'phaser';
 
-import { MainScene, PreloadScene } from './scenes';
+import {
+  GameOverScene,
+  MainScene,
+  PreloadScene,
+} from './scenes';
 
 export namespace Planets {
   export class Game extends Phaser.Game {
@@ -25,6 +29,7 @@ export namespace Planets {
       super(Game.config);
       this.scene.add('preloadScene', new PreloadScene());
       this.scene.add('mainScene', new MainScene());
+      this.scene.add('gameOverScene', new GameOverScene());
       this.scene.start('preloadScene');
     }
   }
