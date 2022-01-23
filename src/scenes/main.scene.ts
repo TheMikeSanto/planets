@@ -1,7 +1,7 @@
 import * as Phaser from 'phaser';
 
 import { DebrisManager } from '../debris';
-
+import { SETTINGS } from '../settings.config';
 import {
   PlanetTileSprite,
   PlayerSprite,
@@ -25,14 +25,13 @@ export class MainScene extends Phaser.Scene {
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
     this.cloudLayer = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'clouds');
     this.planets = [
-      new PlanetTileSprite(this, 20, 'planet1'),
-      new PlanetTileSprite(this, height - 20, 'planet1'),
+      new PlanetTileSprite(this, 20, 'planet1', SETTINGS.planetColors.top),
+      new PlanetTileSprite(this, height - 20, 'planet1', SETTINGS.planetColors.bottom),
     ];
-    this.planets[1].setTint(0x2a24ee);
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
     this.planets.forEach(body => {
       this.physics.add.collider(this.player, body, (player, body) => {
-        // this.scene.start('gameOverScene');
+        if (!SETTINGS.disableFailure) this.scene.start('gameOverScene');
       });
     });
     this.physics.world.bounds.height = height - 80;

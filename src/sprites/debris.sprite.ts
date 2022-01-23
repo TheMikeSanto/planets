@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
+import { SETTINGS } from '../settings.config';
+
 import {
   ASSET_KEYS,
   CollectedDebris,
@@ -58,7 +60,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
     scene.add.existing(this);
     this.scaleFactor = this.determineScaleFactor();
     this.setScale(this.scaleFactor);
-    if (this.debrisSource === DebrisSource.Bottom) this.setTint(0x2a24ee);
+    this.applyTint();
   }
 
   /**
@@ -92,6 +94,17 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
   public update() {
     if (this.shouldRotate) this.rotate();
     this.setX(this.position.x -(1 - this.scaleFactor));
+  }
+
+  /**
+   * Applies the appropriate tint according to the debris' source planet.
+   */
+  private applyTint(): void {
+    const sourceColorMap = {
+      [DebrisSource.Bottom]: SETTINGS.planetColors.bottom,
+      [DebrisSource.Top]: SETTINGS.planetColors.top,
+    };
+    this.setTint(sourceColorMap[this.debrisSource]);
   }
 
   /**
