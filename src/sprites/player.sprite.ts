@@ -3,19 +3,23 @@ import * as Phaser from 'phaser';
 import {
   CollectedDebris,
   DebrisCollection,
+  DebrisManager
 } from '../debris';
 import { DebrisSprite } from './debris.sprite';
 import { GravCannonProjectileSprite } from './';
 
 const DEFAULT_FIRE_COOLDOWN = 1000; //TODO: abstract into a CONSTANTS file?
-const MAX_FIRING_RANGE = 100;
+const FIRING_DISTANCE = 100;
+const FIRING_RADIUS = 25;
+const ROTATION_SPEED = 1 * Math.PI; // radians/second
 
 export class PlayerSprite extends Phaser.GameObjects.Sprite {
   private readonly movementRate = 2;
   private readonly movementAngle = 5;
   private readonly debris: DebrisCollection = new DebrisCollection();
-  private gravGunField: Phaser.GameObjects.Triangle;
+  public gravGunField: Phaser.GameObjects.Triangle;
   private inFiringCooldown = false;
+  private isFiring = false;
 
   constructor(scene: Phaser.Scene, x, y) {
     super(scene, x, y, 'player');
@@ -27,11 +31,11 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
 
     // draw triangle
     this.gravGunField = 
-      this.scene.add.triangle(0, 0, 
-        this.position.x, this.position.y, 
-        this.position.x + MAX_FIRING_RANGE, this.position.y + 20, 
-        this.position.x + MAX_FIRING_RANGE, this.position.y - 20, 
-        0xfc010e);
+      this.scene.add.triangle(this.position.x, this.position.y, 
+        0, 0, 
+        0 + FIRING_DISTANCE, 0 + FIRING_RADIUS, 
+        0 + FIRING_DISTANCE, 0 - FIRING_RADIUS, 
+        0xfc010e, 0);
     this.scene.physics.add.existing(this.gravGunField);
     this.gravGunField.setOrigin(0, 0);
   }
@@ -45,9 +49,22 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     return { x: this.x, y: this.y };
   }
 
-  public setPlayerRotation(angle:any ) {
-    this.setRotation(angle);
-    this.gravGunField.setRotation(angle);
+  /**
+   * Sets the rotation of the Player + Grav Gun Field together
+   * @param angle angle in radians
+   * @param delta time in ms from previous frame (from scene `update` function)
+   */
+  public setPlayerRotation(angle: number, delta: number) {
+    this.rotation = Phaser.Math.Angle.RotateTo(
+      this.rotation,
+      angle,
+      ROTATION_SPEED * 0.001 * delta
+    );
+    this.gravGunField.rotation = Phaser.Math.Angle.RotateTo(
+      this.gravGunField.rotation,
+      angle + Math.PI/2,
+      ROTATION_SPEED * 0.001 * delta
+    );
   }
 
 
@@ -67,31 +84,40 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   public fireGravityCannon(cursorX: number, cursorY: number): void {
     if (this.inFiringCooldown) return
     this.inFiringCooldown = true;
-    //  const projectile = new GravCannonProjectileSprite(this.scene, this.position.x,this.position.y);
+    this.isFiring = true;
 
-    this.scene.physics.moveTo(triangleProj, cursorX, cursorY, 50);
+    this.gravGunField.fillAlpha = 1; 
 
-    const cursorAngle = Phaser.Math.Angle.Between(this.position.x, this.position.y, cursorX, cursorY);
-
+    // const debrisCollisionGroup = DebrisManager.debrisCollisionGroup();
+    // const debrisCollider = this.scene.physics.add.collider(debrisCollisionGroup, this.gravGunField, 
+    //   (debris, gravGunField) => {
+    //     console.log(`DEBRIS/GRAV COLLISON BOO YAH ${}`)
+    // })
 
     // return projectile to player after a certain distance travelled
     // TODO: find more elegant way to track distance projectile traveled
-    setTimeout(() => {
-      const collider = this.scene.physics.add.collider(triangleProj, this, (projectile, player) => {
-        console.log('destroying projectile on player impact');
-        projectile.destroy();
-        collider.destroy();
-      });
-      this.scene.physics.moveTo(triangleProj, this.position.x, this.position.y);
-      this.inFiringCooldown = false;
-    }, MAX_FIRING_RANGE);
+    // setTimeout(() => {
+    //   const collider = this.scene.physics.add.collider(triangleProj, this, (projectile, player) => {
+    //     console.log('destroying projectile on player impact');
+    //     projectile.destroy();
+    //     collider.destroy();
+    //   });
+    //   this.scene.physics.moveTo(triangleProj, this.position.x, this.position.y);
+    //   this.inFiringCooldown = false;
+    // }, );
+  }
+
+  public stopGravityCannon(): void {
+    this.isFiring = true;
+    this.inFiringCooldown = false;
+    this.gravGunField.fillAlpha = 0;
   }
 
   public update(): void {
     this.body.velocity.y = this.debris.getRelativeMass() * 100;
     // console.log('Velocity: ', this.body.velocity.y);
-    // link triangle position to sprite
-    this.gravGunField.body.velocity.y = this.body.velocity.y;
+    // link gravGunField position to sprite
+    this.gravGunField.setPosition(this.position.x, this.position.y);
   }
 
 }

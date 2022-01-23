@@ -15,7 +15,7 @@ export class MainScene extends Phaser.Scene {
   private planets: PlanetTileSprite[];
   private trajectory: Phaser.Curves.Path;
   private graphics: Phaser.GameObjects.Graphics;
-  private pointerTargetAngle: number
+
 
   constructor () {
     super('mainScene');
@@ -40,12 +40,6 @@ export class MainScene extends Phaser.Scene {
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
     this.debrisManager = new DebrisManager(this, this.player);
     this.debrisManager.start();
-
-    this.input.on('pointermove', (pointer) => {
-      this.pointerTargetAngle = Phaser.Math.Angle.BetweenPoints(this.player.position, pointer);
-    });
-      
-    
   }
   
   public update(time, delta): void {
@@ -56,9 +50,11 @@ export class MainScene extends Phaser.Scene {
     this.planets.forEach(planet => planet.tilePositionX += scrollFactor);
     this.drawTrajectory();
     this.player.update();
-    this.updatePlayerAim();
+    this.updatePlayerAim(delta);
     if (this.input.mousePointer.isDown) {
       this.player.fireGravityCannon(this.input.x, this.input.y);
+    } else {
+      this.player.stopGravityCannon();
     }
     
   }
@@ -94,11 +90,12 @@ export class MainScene extends Phaser.Scene {
 
   /**
    * Rotates the player to face the cursor
+   * @param delta time in ms from previous frame (from scene `update` function)
    */
-  private updatePlayerAim(): void {
+  private updatePlayerAim(delta): void {
     if (this.input.x !== 0 && this.input.y !== 0) {
       const cursorAngle = this.getCursorAngle();
-      this.player.setPlayerRotation(cursorAngle - Math.PI/2);
+      this.player.setPlayerRotation(cursorAngle - Math.PI/2, delta);
     }
     // this.player.setPlayerRotation(this.pointerTargetAngle - Math.PI/2);
   }

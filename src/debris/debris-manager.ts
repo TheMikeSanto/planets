@@ -79,6 +79,13 @@ export class DebrisManager {
       this.player.collectDebris(debris.collectionData);
       this.destroy(debris);
     });
+    const gravGunFieldCollider = this.scene.physics.add.collider(this.player.gravGunField, debris, (player, body) => {
+      gravGunFieldCollider.destroy();
+      console.log('GRAV GUN COLLIDe');
+      this.player.collectDebris(debris.collectionData);
+      this.destroy(debris);
+      debugger;
+    });
     this.scene.physics.add.collider(this.barrier, debris, (barrier, body) => {
       this.destroy(debris);
     });
@@ -117,4 +124,5 @@ export class DebrisManager {
       .length / total;
     return { small, medium, large };
   }
+
 }
