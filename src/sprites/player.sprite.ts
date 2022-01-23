@@ -38,6 +38,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
         0xfc010e, 0);
     this.scene.physics.add.existing(this.gravGunField);
     this.gravGunField.setOrigin(0, 0);
+    debugger;
   }
 
   /**
@@ -60,11 +61,12 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
       angle,
       ROTATION_SPEED * 0.001 * delta
     );
-    this.gravGunField.rotation = Phaser.Math.Angle.RotateTo(
-      this.gravGunField.rotation,
-      angle + Math.PI/2,
-      ROTATION_SPEED * 0.001 * delta
-    );
+    this.gravGunField.setRotation(angle);
+    // this.gravGunField.rotation = Phaser.Math.Angle.RotateTo(
+    //   this.gravGunField.rotation,
+    //   angle + Math.PI/2,
+    //   ROTATION_SPEED * 0.001 * delta
+    // );
   }
 
 
@@ -119,5 +121,4 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     // link gravGunField position to sprite
     this.gravGunField.setPosition(this.position.x, this.position.y);
   }
-
 }

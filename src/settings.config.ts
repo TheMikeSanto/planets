@@ -1,5 +1,7 @@
 /** Global configuration variables for easily tuning gameplay mechanics/feel */
 export const SETTINGS = {
+  /** Enables debugging */
+  debug: true,
   /** Affects the base scroll rate/debris spawn rate */
   gameSpeed: 1,
   /** Enables the game over scene */

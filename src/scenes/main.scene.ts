@@ -56,7 +56,6 @@ export class MainScene extends Phaser.Scene {
     } else {
       this.player.stopGravityCannon();
     }
-    
   }
 
   /**
