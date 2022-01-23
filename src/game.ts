@@ -28,6 +28,7 @@ export namespace Planets {
       physics: {
         default: 'arcade',
       },
+      disableContextMenu: true,
       plugins,
     };
 

@@ -51,11 +51,6 @@ export class MainScene extends Phaser.Scene {
     this.drawTrajectory();
     this.player.update();
     this.updatePlayerAim(delta);
-    if (this.input.mousePointer.isDown) {
-      this.player.fireGravityCannon(this.input.x, this.input.y);
-    } else {
-      this.player.stopGravityCannon();
-    }
   }
 
   /**

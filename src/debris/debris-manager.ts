@@ -53,7 +53,10 @@ export class DebrisManager {
   }
 
   public update(): void {
-    this.debris.forEach(aDebris => aDebris.update());
+    this.debris.forEach(aDebris => {
+      aDebris.update()
+      this.registerProjectileColliders(aDebris);
+    });
   }
 
   /**
@@ -71,25 +74,42 @@ export class DebrisManager {
    * Takes the given object and registers a physics collider between the object and the player
    * sprite
    *
-   * @param body body to be registered as a collider
+   * @param debris a single debris to be registered as a collider
    */
-  private registerColliders(debris: DebrisSprite): void {
+  private registerSpawnColliders(debris: DebrisSprite): void {
     const playerCollider = this.scene.physics.add.collider(this.player, debris, (player, body) => {
       playerCollider.destroy();
       this.player.collectDebris(debris.collectionData);
       this.destroy(debris);
     });
-    const gravGunFieldCollider = this.scene.physics.add.collider(this.player.gravGunField, debris, (player, body) => {
-      gravGunFieldCollider.destroy();
-      console.log('GRAV GUN COLLIDe');
-      this.player.collectDebris(debris.collectionData);
-      this.destroy(debris);
-      debugger;
-    });
     this.scene.physics.add.collider(this.barrier, debris, (barrier, body) => {
       this.destroy(debris);
     });
   }
+
+  /**
+   * Takes the given object and registers a physics collider between the object and the player
+   * sprite
+   *
+   * @param debris a single debris to be registered as a collider
+   */
+     private registerProjectileColliders(debris: DebrisSprite): void {
+       const gravProjectiles = this.player.gravProjectiles;
+       gravProjectiles.forEach(proj => {
+         const gravProjCollider = this.scene.physics.add.collider(proj, debris, (proj, body) => {
+          gravProjCollider.destroy();
+          // TEMP destroy it
+          if (proj['projType'] === 'push') {
+            debris.body.velocity.x = -1*debris.body.velocity.x
+          } else if (proj['projType'] === 'pull') {
+            console.log(`debris captured with proj.age ${proj['age']}`);
+            this.player.collectDebris(debris.collectionData);
+            this.destroy(debris);
+          }
+         })
+       })
+    }
+
 
   /**
    * Creates the given number of debris objects and registers appropriate physics colliders.
@@ -100,7 +120,7 @@ export class DebrisManager {
   private spawnDebris(numDebris: number, debrisType = DebrisType.Default): void {
     [...Array(numDebris)].map(() => {
       const debris = new DebrisSprite(this.scene, randomInRange(80, 500), debrisType);
-      this.registerColliders(debris);
+      this.registerSpawnColliders(debris);
       this.debris.push(debris);
     });
   }

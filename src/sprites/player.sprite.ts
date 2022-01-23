@@ -9,36 +9,34 @@ import { DebrisSprite } from './debris.sprite';
 import { GravCannonProjectileSprite } from './';
 
 const DEFAULT_FIRE_COOLDOWN = 1000; //TODO: abstract into a CONSTANTS file?
-const FIRING_DISTANCE = 100;
-const FIRING_RADIUS = 25;
+const FIRING_DISTANCE = 5; // how many update ticks a projectile will live before being destroyed
+const MAX_NUM_PROJECTILES = 10; // maxmimum # of projectiles to draw (for performance)
 const ROTATION_SPEED = 1 * Math.PI; // radians/second
 
 export class PlayerSprite extends Phaser.GameObjects.Sprite {
   private readonly movementRate = 2;
   private readonly movementAngle = 5;
   private readonly debris: DebrisCollection = new DebrisCollection();
-  public gravGunField: Phaser.GameObjects.Triangle;
+  public gravProjectiles: [GravCannonProjectileSprite?] = [];
   private inFiringCooldown = false;
   private isFiring = false;
+  private currentProjType = 'pull';
 
   constructor(scene: Phaser.Scene, x, y) {
     super(scene, x, y, 'player');
     scene.physics.add.existing(this);
     scene.add.existing(this);
     this.body['pushable'] = false; // so player body doesn't get pushed back by projectile
-    this.setScale(0.35);
+    this.setScale(0.3);
     this.setRotation(3*Math.PI/2);
 
-    // draw triangle
-    this.gravGunField = 
-      this.scene.add.triangle(this.position.x, this.position.y, 
-        0, 0, 
-        0 + FIRING_DISTANCE, 0 + FIRING_RADIUS, 
-        0 + FIRING_DISTANCE, 0 - FIRING_RADIUS, 
-        0xfc010e, 0);
-    this.scene.physics.add.existing(this.gravGunField);
-    this.gravGunField.setOrigin(0, 0);
-    debugger;
+    // mouse control
+    this.scene.input.on('pointerdown', pointer => {
+      if (pointer.rightButtonDown()) this.fireGravityCannon('push');
+      if (pointer.leftButtonDown()) this.fireGravityCannon('pull');
+    })
+    this.scene.input.on('pointerup', pointer => this.stopGravityCannon());
+
   }
 
   /**
@@ -61,12 +59,6 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
       angle,
       ROTATION_SPEED * 0.001 * delta
     );
-    this.gravGunField.setRotation(angle);
-    // this.gravGunField.rotation = Phaser.Math.Angle.RotateTo(
-    //   this.gravGunField.rotation,
-    //   angle + Math.PI/2,
-    //   ROTATION_SPEED * 0.001 * delta
-    // );
   }
 
 
@@ -80,45 +72,48 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   }
 
   /** Fires the Gravity Cannon (if it is not in cooldown)
-  * @param cursorX The x coordinate of the cursor's current position
-  * @param cursorY The y coordinate of the cursor's current position
+  * @param projType Type of projectile: 'push' or 'pull
   */
-  public fireGravityCannon(cursorX: number, cursorY: number): void {
-    if (this.inFiringCooldown) return
-    this.inFiringCooldown = true;
+  public fireGravityCannon(projType: string): void {
+    const tooManyProjectiles = this.gravProjectiles.length > MAX_NUM_PROJECTILES;
+    if (this.inFiringCooldown || tooManyProjectiles) return
+    // this.inFiringCooldown = true;
+    this.currentProjType = projType;
     this.isFiring = true;
-
-    this.gravGunField.fillAlpha = 1; 
-
-    // const debrisCollisionGroup = DebrisManager.debrisCollisionGroup();
-    // const debrisCollider = this.scene.physics.add.collider(debrisCollisionGroup, this.gravGunField, 
-    //   (debris, gravGunField) => {
-    //     console.log(`DEBRIS/GRAV COLLISON BOO YAH ${}`)
-    // })
-
-    // return projectile to player after a certain distance travelled
-    // TODO: find more elegant way to track distance projectile traveled
-    // setTimeout(() => {
-    //   const collider = this.scene.physics.add.collider(triangleProj, this, (projectile, player) => {
-    //     console.log('destroying projectile on player impact');
-    //     projectile.destroy();
-    //     collider.destroy();
-    //   });
-    //   this.scene.physics.moveTo(triangleProj, this.position.x, this.position.y);
-    //   this.inFiringCooldown = false;
-    // }, );
   }
 
   public stopGravityCannon(): void {
-    this.isFiring = true;
+    this.isFiring = false;
     this.inFiringCooldown = false;
-    this.gravGunField.fillAlpha = 0;
+  }
+  
+  private incrementProjectileStatus(gravProjectiles): [GravCannonProjectileSprite] {
+    return gravProjectiles.reduce((newProjArray, proj) => {
+      // add 1 age to each projectile
+      proj.age += 1;
+
+      // if age > threshold, destroy the projectile
+      if (proj.age >= FIRING_DISTANCE) {
+        proj.destroy();
+      } else {
+        newProjArray.push(proj);
+      }
+      return newProjArray;
+    }, [])
   }
 
   public update(): void {
     this.body.velocity.y = this.debris.getRelativeMass() * 100;
-    // console.log('Velocity: ', this.body.velocity.y);
-    // link gravGunField position to sprite
-    this.gravGunField.setPosition(this.position.x, this.position.y);
+    // console.log('Velocity: ', this.body.velocity.y)
+
+    // Shoot the gun
+    if (this.isFiring) {
+      const newProjectile = new GravCannonProjectileSprite(this.scene, this.position.x, this.position.y, this.currentProjType);
+      this.scene.physics.moveTo(newProjectile, this.scene.input.x, this.scene.input.y, 1000);
+      this.gravProjectiles.push(newProjectile);
+      console.log(`firing gravity gun of type: ${this.currentProjType}` );
+    }
+    if (this.gravProjectiles.length) this.gravProjectiles = this.incrementProjectileStatus(this.gravProjectiles);
+
   }
 }

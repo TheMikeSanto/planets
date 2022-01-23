@@ -63,6 +63,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
     this.scaleFactor = this.determineScaleFactor();
     this.setScale(this.scaleFactor);
     this.applyTint();
+    this.body.velocity.x = -(1 - this.scaleFactor)*100;
   }
 
   /**
@@ -95,8 +96,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
 
   public update() {
     if (this.shouldRotate) this.rotate();
-    this.setX(this.position.x -(1 - this.scaleFactor));
-  }
+   }
 
   /**
    * Applies the appropriate tint according to the debris' source planet.
