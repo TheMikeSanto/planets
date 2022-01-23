@@ -19,7 +19,8 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('background-game-over', 'assets/game-over-bg.png');
     this.load.image('clouds', 'assets/clouds1.png');
     this.load.image('barrier', 'assets/barrier.png');
-    this.load.image('player', 'assets/ship_flat1.png');
+    this.load.spritesheet('player', 'assets/player/ship.png',
+      { frameWidth: 150 });
     this.load.image('planet1', 'assets/planet-white.png');
     this.load.image('planet2', 'assets/planet-purple.png');
     this.load.image('projectile', 'assets/projectile.png');

@@ -44,6 +44,15 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
       collectionTop: scene.sound.add('plop'),
       crash: scene.sound.add('crash'),
     }
+    scene.anims.create({
+      key: 'ship-transform',
+      frames: this.anims.generateFrameNumbers('player', { start: 4, end: 0, first: 4 }),
+      frameRate: 4,
+      repeat: -1,
+    });
+    this.setAngle(270);
+    this.setScale(0.25);
+    this.play('ship-transform');
   }
 
   /**
