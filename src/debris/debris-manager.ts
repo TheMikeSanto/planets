@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
+import { DebrisType } from './debris-type.enum';
 import {
   DebrisSprite,
   PlayerSprite
@@ -10,10 +11,14 @@ import { randomInRange } from '../utils';
 const CONFIG = {
   /** Time in ms between spawn events */
   spawnRate: 3000,
+  /** Time in ms between special spawn events */
+  specialSpawnRate: 6000,
   /** Number of objects to spawn on startup */
   numDebrisOnStart: 10,
   /** Number of objects to spawn per interval */
   numDebrisPerInterval: 10,
+  /** Number of special debris objects to spawn per interval */
+  numSpecialsPerInterval: 1,
 } as const;
 
 /** Manages all of the debris for the entire game state */
@@ -38,6 +43,11 @@ export class DebrisManager {
     this.scene.time.addEvent({
       callback: () => this.spawnDebris(CONFIG.numDebrisPerInterval),
       delay: CONFIG.spawnRate,
+      loop: true,
+    });
+    this.scene.time.addEvent({
+      callback: () => this.spawnDebris(CONFIG.numSpecialsPerInterval, DebrisType.Special),
+      delay: CONFIG.specialSpawnRate,
       loop: true,
     });
   }
@@ -78,11 +88,11 @@ export class DebrisManager {
    * Creates the given number of debris objects and registers appropriate physics colliders.
    *
    * @param numDebris number of debris objects to spawn
+   * @param debrisType optional. specifies the type of debris to spawn
    */
-  private spawnDebris(numDebris: number): void {
-    console.log(this.getSegmentsBySize());
+  private spawnDebris(numDebris: number, debrisType = DebrisType.Default): void {
     [...Array(numDebris)].map(() => {
-      const debris = new DebrisSprite(this.scene, randomInRange(80, 500));
+      const debris = new DebrisSprite(this.scene, randomInRange(80, 500), debrisType);
       this.registerColliders(debris);
       this.debris.push(debris);
     });

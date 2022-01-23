@@ -2,8 +2,10 @@ import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
 import {
+  ASSET_KEYS,
   CollectedDebris,
-  DebrisSource
+  DebrisSource,
+  DebrisType,
 } from '../debris';
 import {
   randomEnum,
@@ -27,11 +29,13 @@ const CONFIG = {
  */
 export class DebrisSprite extends Phaser.GameObjects.Sprite {
   /**The amount the sprite should be scaled relative to the maximum sprite size */
-  private scaleFactor = this.determineScaleFactor();
+  private scaleFactor: number;
+  /** Determines which planet the debris belongs to */
+  private debrisSource: DebrisSource;
+  /** The type of debris */
+  private debrisType: DebrisType;
   /** Determines whether object should rotate */
   private readonly shouldRotate = _.sample([true, false]);
-  /** Determines which planet the debris belongs to */
-  private readonly sourcePlanet = randomEnum(DebrisSource);
   /** Object's spin direction */
   private readonly spinDirection = this.shouldRotate
     ? randomEnum(SpinDirection)
@@ -42,13 +46,19 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
    *
    * @param scene scene the debris will be added to
    * @param y vertical position of debris on creation
+   * @param type optional. type of debris.
+   * @param source optional. debris source.
    */
-  constructor(scene: Phaser.Scene, y: number) {
-    super(scene, scene.scale.width + 100, y, 'debris-white');
+  constructor(scene: Phaser.Scene,y: number, type = DebrisType.Default,
+    source = randomEnum(DebrisSource)) {
+    super(scene, scene.scale.width + 100, y, _.sample(ASSET_KEYS[type]));
+    this.debrisSource = source;
+    this.debrisType = type;
     scene.physics.add.existing(this);
     scene.add.existing(this);
+    this.scaleFactor = this.determineScaleFactor();
     this.setScale(this.scaleFactor);
-    if (this.sourcePlanet === DebrisSource.Bottom) this.setTint(0x2a24ee);
+    if (this.debrisSource === DebrisSource.Bottom) this.setTint(0x2a24ee);
   }
 
   /**
@@ -58,7 +68,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
    */
   public get collectionData(): CollectedDebris {
     return {
-      sourcePlanet: this.sourcePlanet,
+      source: this.debrisSource,
       mass: this.scaleFactor,
     }
   }
@@ -91,7 +101,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
    */
   private determineScaleFactor(): number {
     const scaleFactor = Math.random() / randomInRange(2, 5);
-    return Math.min(scaleFactor, CONFIG.minScaleFactor);
+    return Math.max(scaleFactor, CONFIG.minScaleFactor);
   }
 
   /**

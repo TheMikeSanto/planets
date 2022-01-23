@@ -17,7 +17,7 @@ export class DebrisCollection {
    * @param debris debris to be added to the collection
    */
   public add(debris: CollectedDebris): void {
-    this.collection[debris.sourcePlanet].push(debris);
+    this.collection[debris.source].push(debris);
     console.log(this.collection);
   }
 
