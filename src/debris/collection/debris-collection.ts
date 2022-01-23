@@ -33,7 +33,7 @@ export class DebrisCollection {
       .map(debris => debris.mass)
       .sum()
       .value();
-    console.log('Bottom mass: ', bottomMass, 'Top mass: ', topMass, 'Relative: ', bottomMass - topMass);
+    // console.log('Bottom mass: ', bottomMass, 'Top mass: ', topMass, 'Relative: ', bottomMass - topMass);
     return bottomMass - topMass;
   }
 }

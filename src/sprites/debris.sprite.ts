@@ -22,6 +22,8 @@ enum SpinDirection {
 const CONFIG = {
   /** Minimum scale factor */
   minScaleFactor: 0.1,
+  /** Common velocity multiplier */
+  velocityMultiplier: 75
 } as const;
 
 /**
@@ -93,7 +95,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
 
   public update() {
     if (this.shouldRotate) this.rotate();
-    this.setX(this.position.x -(1 - this.scaleFactor));
+    // this.setX(this.position.x -(1 - this.scaleFactor));
   }
 
   /**
