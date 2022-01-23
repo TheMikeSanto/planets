@@ -39,6 +39,8 @@ export class MainScene extends Phaser.Scene {
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
     this.debrisManager = new DebrisManager(this, this.player);
     this.debrisManager.start();
+
+    
   }
 
   public update(): void {
@@ -49,6 +51,10 @@ export class MainScene extends Phaser.Scene {
     this.planets.forEach(planet => planet.tilePositionX += scrollFactor);
     this.drawTrajectory();
     this.player.update();
+    this.updatePlayerAim();
+    if (this.input.mousePointer.isDown) {
+      this.player.fireGravityCannon(this.input.x, this.input.y);
+    }
   }
 
   /**
@@ -79,4 +85,21 @@ export class MainScene extends Phaser.Scene {
   private isPressed(key: string): boolean {
     return this.input.keyboard.addKey(key).isDown;
   }
+
+  /**
+   * Rotates the player to face the cursor
+   */
+  private updatePlayerAim(): void {
+    const cursorAngle = this.getCursorAngle();
+    this.player.setRotation(cursorAngle + Math.PI/2);
+  }
+
+  /**
+   * Determine the angle between the player and mouse cursor
+   * @returns the angle between the player and the mouse cursor
+   */
+  private getCursorAngle(): number {
+    return Phaser.Math.Angle.Between(this.player.position.x, this.player.position.y, this.input.x, this.input.y);
+  }
+
 }
