@@ -5,7 +5,6 @@ import {
   DebrisCollection,
   DebrisManager
 } from '../debris';
-import { DebrisSprite } from './debris.sprite';
 import { GravCannonProjectileSprite } from './';
 
 const DEFAULT_FIRE_COOLDOWN = 1000; //TODO: abstract into a CONSTANTS file?
@@ -49,20 +48,6 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   }
 
   /**
-   * Sets the rotation of the Player + Grav Gun Field together
-   * @param angle angle in radians
-   * @param delta time in ms from previous frame (from scene `update` function)
-   */
-  public setPlayerRotation(angle: number, delta: number) {
-    this.rotation = Phaser.Math.Angle.RotateTo(
-      this.rotation,
-      angle,
-      ROTATION_SPEED * 0.001 * delta
-    );
-  }
-
-
-  /**
    * Adds the given debris to the player's debris collection.
    *
    * @param debris debris to be collected
@@ -80,6 +65,19 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     // this.inFiringCooldown = true;
     this.currentProjType = projType;
     this.isFiring = true;
+  }
+
+  /**
+   * Sets the rotation of the Player + Grav Gun Field together
+   * @param angle angle in radians
+   * @param delta time in ms from previous frame (from scene `update` function)
+   */
+   public setPlayerRotation(angle: number, delta: number) {
+    this.rotation = Phaser.Math.Angle.RotateTo(
+      this.rotation,
+      angle,
+      ROTATION_SPEED * 0.001 * delta
+    );
   }
 
   public stopGravityCannon(): void {
