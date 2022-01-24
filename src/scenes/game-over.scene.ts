@@ -12,8 +12,6 @@ export class GameOverScene extends Phaser.Scene {
     const { height, width } = this.scale;
     const midpointX = width * 0.5;
     const midpointY = height * 0.5;
-    this.sound.add('harp', { loop: false })
-      .play();
     this.background = this.add.tileSprite(midpointX, midpointY, 1200, 600,
       'background-game-over');
     this.text = this.add.text(midpointX - 25, midpointY, 'GAME OVER');
@@ -21,8 +19,12 @@ export class GameOverScene extends Phaser.Scene {
       font: 'Arial',
       fontSize: '128px',
     });
+    const launchSound = this.sound.add('launch');
     this.time.addEvent({
-      callback: () => this.scene.start('mainScene'),
+      callback: () => {
+        launchSound.play();
+        this.scene.start('mainScene');
+      },
       delay: 3000,
     });
   }

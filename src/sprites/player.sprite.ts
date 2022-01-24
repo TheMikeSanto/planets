@@ -14,21 +14,23 @@ import {
 const ROTATION_SPEED = 1 * Math.PI; // radians/second
 
 export class PlayerSprite extends Phaser.GameObjects.Sprite {
-  private readonly sounds: {
-    collectionBottom: Phaser.Sound.BaseSound,
-    collectionTop: Phaser.Sound.BaseSound,
-  };
+  private crashed = false;
   private readonly debris: DebrisCollection = new DebrisCollection();
   private gravCannonAction: ActionType = ActionType.Pull;
   private inFiringCooldown = false;
   private isFiring = false;
   private projectiles: Phaser.GameObjects.Group;
+  private readonly sounds: {
+    collectionBottom: Phaser.Sound.BaseSound,
+    collectionTop: Phaser.Sound.BaseSound,
+    crash: Phaser.Sound.BaseSound,
+  };
 
   constructor(scene: Phaser.Scene, x, y) {
     super(scene, x, y, 'player');
     scene.physics.add.existing(this);
     scene.add.existing(this);
-    this.body['pushable'] = false; 
+    this.body['pushable'] = false;
     this.setScale(0.3);
     this.setRotation(3*Math.PI/2);
     this.projectiles = scene.add.group([], { runChildUpdate: true });
@@ -40,6 +42,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.sounds = {
       collectionBottom: scene.sound.add('low-bump'),
       collectionTop: scene.sound.add('plop'),
+      crash: scene.sound.add('crash'),
     }
   }
 
@@ -94,12 +97,22 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     );
   }
 
+  /**
+   * Plays sounds and animation for the crashed state.
+   */
+  public showCrash(): void {
+    this.crashed = true;
+    this.body.velocity.y = 0;
+    this.sounds.crash.play();
+  }
+
   public stopGravityCannon(): void {
     this.isFiring = false;
     this.inFiringCooldown = false;
   }
 
   public update(): void {
+    if (this.crashed) return;
     this.body.velocity.y = this.debris.getRelativeMass() * 100;
 
     if (this.isFiring) {

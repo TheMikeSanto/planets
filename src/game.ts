@@ -18,6 +18,8 @@ export namespace Planets {
     private static readonly config = {
       type: Phaser.AUTO,
       backgroundColor: ' #000000',
+      disableContextMenu: true,
+      noAudio: SETTINGS.disableAudio,
       scale: {
         mode: Phaser.Scale.FIT,
         parent: 'content',
@@ -28,7 +30,6 @@ export namespace Planets {
       physics: {
         default: 'arcade',
       },
-      disableContextMenu: true,
       plugins,
     };
 

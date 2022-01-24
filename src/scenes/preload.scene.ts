@@ -9,7 +9,7 @@ export class PreloadScene extends Phaser.Scene {
     super('preloadScene');
   }
 
-  preload() {
+  public preload(): void {
     ASSET_KEYS[DebrisType.Default].forEach(key => {
       this.load.image(key, `assets/debris/${key}.png`);
     });
@@ -23,7 +23,9 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('planet1', 'assets/planet-white.png');
     this.load.image('planet2', 'assets/planet-purple.png');
     this.load.image('starfield', 'assets/starfield.png');
-    this.load.audio('harp', 'assets/audio/harp.wav');
+    this.load.audio('background-music', 'assets/audio/background-music.wav');
+    this.load.audio('crash', 'assets/audio/crash.mp3');
+    this.load.audio('launch', 'assets/audio/launch.wav');
     this.load.audio('low-bump', 'assets/audio/low-bump.wav');
     this.load.audio('plop', 'assets/audio/plop.wav');
     this.load.on('complete', () => {

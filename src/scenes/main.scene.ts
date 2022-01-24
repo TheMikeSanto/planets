@@ -8,6 +8,7 @@ import {
 } from '../sprites';
 
 export class MainScene extends Phaser.Scene {
+  private audio;
   private debrisManager: DebrisManager;
   private player: PlayerSprite;
   private starField: Phaser.GameObjects.TileSprite;
@@ -16,12 +17,12 @@ export class MainScene extends Phaser.Scene {
   private trajectory: Phaser.Curves.Path;
   private graphics: Phaser.GameObjects.Graphics;
 
-
   constructor () {
     super('mainScene');
   }
   
   public create(): void {
+    this.cameras.main.fadeIn(2000);
     const { height, width } = this.scale;
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
     this.cloudLayer = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'clouds');
@@ -31,8 +32,9 @@ export class MainScene extends Phaser.Scene {
     ];
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
     this.planets.forEach(body => {
-      this.physics.add.collider(this.player, body, (player, body) => {
-        if (!SETTINGS.disableFailure) this.scene.start('gameOverScene');
+      const collider = this.physics.add.collider(this.player, body, (player, body) => {
+        collider.destroy();
+        this.doGameOver();
       });
     });
     this.physics.world.bounds.height = height - 80;
@@ -40,6 +42,8 @@ export class MainScene extends Phaser.Scene {
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
     this.debrisManager = new DebrisManager(this, this.player);
     this.debrisManager.start();
+    this.audio = this.sound.add('background-music');
+    this.audio.play();
   }
   
   public update(time, delta): void {
@@ -50,6 +54,19 @@ export class MainScene extends Phaser.Scene {
     this.drawTrajectory();
     this.player.update();
     this.updatePlayerAim(delta);
+  }
+
+  /**
+   * Shows the game over sequence.
+   */
+  private doGameOver(): void {
+    this.player.showCrash();
+    if (!SETTINGS.disableFailure) {
+      this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+        this.time.delayedCall(1000, () => this.scene.start('gameOverScene'));
+      });
+      this.cameras.main.fadeOut(2000, 0, 0, 0);
+    }
   }
 
   /**
