@@ -94,7 +94,7 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
     return this.scaleFactor;
   }
 
-  public update() {
+  public update(): void {
     if (this.shouldRotate) this.rotate();
    }
 

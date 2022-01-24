@@ -6,6 +6,7 @@ import {
   DebrisSprite,
   PlayerSprite
 } from '../sprites';
+import { ActionType } from '../sprites/grav-cannon';
 import { randomInRange } from '../utils';
 
 const CONFIG = {
@@ -24,7 +25,7 @@ const CONFIG = {
 /** Manages all of the debris for the entire game state */
 export class DebrisManager {
   private barrier: Phaser.GameObjects.Sprite;
-  private debris: DebrisSprite[] = [];
+  private group: Phaser.GameObjects.Group;
   private player: PlayerSprite;
   private scene: Phaser.Scene;
 
@@ -33,6 +34,8 @@ export class DebrisManager {
     this.player = player;
     this.barrier = this.scene.add.sprite(-100, 0, 'barrier');
     this.scene.physics.add.existing(this.barrier);
+    this.group = scene.add.group([], { runChildUpdate: true });
+    this.registerGroupColliders();
   }
 
   /**
@@ -52,22 +55,25 @@ export class DebrisManager {
     });
   }
 
-  public update(): void {
-    this.debris.forEach(aDebris => {
-      aDebris.update()
-      this.registerProjectileColliders(aDebris);
-    });
-  }
-
   /**
-   * Removes the given debris from the debris array and destroyts it.
-   *
-   * @param debris debris to be destroyed/removed
+   * Creates collisions between the debris group and other related physics groups.
    */
-  private destroy(debris: DebrisSprite): void {
-    const index = this.debris.indexOf(debris);
-    if (index) this.debris.splice(index, 1);
-    debris.destroy();
+  private registerGroupColliders(): void {
+    this.scene.physics.add.overlap(this.group, this.player.projectileGroup,
+      (debris, projectile) => {
+      const type = projectile.name === `${ActionType.Pull}`
+        ? ActionType.Pull
+        : ActionType.Push;
+      if (type === ActionType.Push) {
+        debris.body.velocity.x = -1 * debris.body.velocity.x;
+      } else {
+        const { x, y } = this.player.position;
+        this.scene.physics.moveTo(debris, x, y, 500)
+      }
+    });
+    this.scene.physics.add.collider(this.barrier, this.group, (barrier, body) => {
+      body.destroy();
+    });
   }
 
   /**
@@ -76,40 +82,13 @@ export class DebrisManager {
    *
    * @param debris a single debris to be registered as a collider
    */
-  private registerSpawnColliders(debris: DebrisSprite): void {
+  private registerPlayerCollider(debris: DebrisSprite): void {
     const playerCollider = this.scene.physics.add.collider(this.player, debris, (player, body) => {
       playerCollider.destroy();
       this.player.collectDebris(debris.collectionData);
-      this.destroy(debris);
-    });
-    this.scene.physics.add.collider(this.barrier, debris, (barrier, body) => {
-      this.destroy(debris);
+      debris.destroy();
     });
   }
-
-  /**
-   * Takes the given object and registers a physics collider between the object and the player
-   * sprite
-   *
-   * @param debris a single debris to be registered as a collider
-   */
-     private registerProjectileColliders(debris: DebrisSprite): void {
-       const gravProjectiles = this.player.gravProjectiles;
-       gravProjectiles.forEach(proj => {
-         const gravProjCollider = this.scene.physics.add.collider(proj, debris, (proj, body) => {
-          gravProjCollider.destroy();
-          // TEMP destroy it
-          if (proj['projType'] === 'push') {
-            debris.body.velocity.x = -1*debris.body.velocity.x
-          } else if (proj['projType'] === 'pull') {
-            console.log(`debris captured with proj.age ${proj['age']}`);
-            this.player.collectDebris(debris.collectionData);
-            this.destroy(debris);
-          }
-         })
-       })
-    }
-
 
   /**
    * Creates the given number of debris objects and registers appropriate physics colliders.
@@ -120,29 +99,8 @@ export class DebrisManager {
   private spawnDebris(numDebris: number, debrisType = DebrisType.Default): void {
     [...Array(numDebris)].map(() => {
       const debris = new DebrisSprite(this.scene, randomInRange(80, 500), debrisType);
-      this.registerSpawnColliders(debris);
-      this.debris.push(debris);
+      this.group.add(debris);
+      this.registerPlayerCollider(debris);
     });
   }
-
-  /**
-   * Determines the percentage of the total population belonging to each segment of
-   * debris ordered by size.
-   *
-   * @returns breakdown of percentages of each segment
-   */
-  private getSegmentsBySize(): { small: number, medium: number, large: number } {
-    const limits = { small: 0.09, medium: 0.17, large: 0.25 }
-    const total = this.debris.length;
-    const small = _.filter(this.debris, debris => debris.size <= limits.small)
-      .length / total;
-    const medium = _.filter(this.debris,
-      debris => debris.size > limits.small && debris.size <= limits.medium)
-      .length / total;
-    const large = _.filter(this.debris,
-      debris => debris.size > limits.medium && debris.size <= limits.large)
-      .length / total;
-    return { small, medium, large };
-  }
-
 }

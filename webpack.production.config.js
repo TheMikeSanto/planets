@@ -27,14 +27,6 @@ module.exports = {
   plugins: [
     definePlugin,
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new webpack.optimize.UglifyJsPlugin({
-      drop_console: true,
-      minimize: true,
-      output: {
-        comments: false
-      }
-    }),
-    new webpack.optimize.CommonsChunkPlugin({ name: 'vendor' /* chunkName= */, filename: 'js/vendor.bundle.js' /* filename= */ }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './src/index.html',
