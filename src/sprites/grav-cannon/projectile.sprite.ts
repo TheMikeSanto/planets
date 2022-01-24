@@ -26,11 +26,10 @@ export class ProjectileSprite extends Phaser.GameObjects.Sprite {
   public action: ActionType;
 
   constructor(scene: Phaser.Scene, config: ProjectileSpriteConfig) {
-    super(scene, config.start.x, config.start.y, 'grav-cannon-projectile');
+    super(scene, config.start.x, config.start.y, 'projectile');
     this.name = `${config.action}`;
     this.action = config.action;
     this.setScale(0.7);
-    this.setVisible(false);
     scene.physics.add.existing(this);
     scene.add.existing(this);
     scene.physics.moveTo(this, config.end.x, config.end.y, CONFIG.movementSpeed);

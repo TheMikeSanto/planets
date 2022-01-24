@@ -24,6 +24,7 @@ export class MainScene extends Phaser.Scene {
   public create(): void {
     this.cameras.main.fadeIn(2000);
     const { height, width } = this.scale;
+    this.cameras.main.centerOn(width * 0.5, height * 0.5);
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
     this.cloudLayer = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'clouds');
     this.planets = [
@@ -62,6 +63,8 @@ export class MainScene extends Phaser.Scene {
   private doGameOver(): void {
     this.player.showCrash();
     if (!SETTINGS.disableFailure) {
+      this.cameras.main.pan(this.player.position.x, this.player.position.y, 2000);
+      this.cameras.main.zoomTo(4, 3000);
       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
         this.time.delayedCall(1000, () => this.scene.start('gameOverScene'));
       });

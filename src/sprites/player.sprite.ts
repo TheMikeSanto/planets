@@ -90,6 +90,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
    * @param delta time in ms from previous frame (from scene `update` function)
    */
   public setPlayerRotation(angle: number, delta: number) {
+    if (this.crashed) return;
     this.rotation = Phaser.Math.Angle.RotateTo(
       this.rotation,
       angle,
