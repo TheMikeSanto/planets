@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser';
 
 import { ActionType } from './action-type.enum';
+import { PlayerSprite } from '../player.sprite';
 
 type ProjectileSpriteConfig = {
   action: ActionType,
@@ -15,21 +16,26 @@ type ProjectileSpriteConfig = {
 };
 
 const CONFIG = {
-  /** Projectile's lifespan in ticks */
-  maxLifespanTicks: 40,
+  /** Maximum distance a projectile can get from its origin before dying */
+  beamLength: 100,
   /** Projectile movement speed */
-  movementSpeed: 1000,
+  movementSpeed: 200,
 };
 
 export class ProjectileSprite extends Phaser.GameObjects.Sprite {
-  public age = 0;
-  public action: ActionType;
+  private action: ActionType;
+  private player: PlayerSprite; 
 
-  constructor(scene: Phaser.Scene, config: ProjectileSpriteConfig) {
+  constructor(player: PlayerSprite, scene: Phaser.Scene, config: ProjectileSpriteConfig) {
     super(scene, config.start.x, config.start.y, 'projectile');
-    this.name = `${config.action}`;
     this.action = config.action;
-    this.setScale(0.7);
+    this.player = player;
+    this.name = `${this.action}`;
+    this.setScale(0.2);
+    this.setAngle(90);
+    this.setTintFill(this.action === ActionType.Pull
+        ? 0xff3d3d
+        : 0x73e6d8);
     scene.physics.add.existing(this);
     scene.add.existing(this);
     scene.physics.moveTo(this, config.end.x, config.end.y, CONFIG.movementSpeed);
@@ -46,7 +52,8 @@ export class ProjectileSprite extends Phaser.GameObjects.Sprite {
   }
 
   public update(): void {
-    ++this.age;
-    if (++this.age >= CONFIG.maxLifespanTicks) this.destroy();
+    if (Phaser.Math.Distance.BetweenPoints(this, this.player) > CONFIG.beamLength) {
+      this.destroy();
+    }
   }
 }

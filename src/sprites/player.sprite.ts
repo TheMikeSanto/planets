@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
 import { SETTINGS } from '../settings.config';
@@ -27,10 +28,11 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   };
 
   constructor(scene: Phaser.Scene, x, y) {
-    super(scene, x, y, 'player');
+    super(scene, x, y, 'player', 4);
     scene.physics.add.existing(this);
     scene.add.existing(this);
     this.body['pushable'] = false;
+    this.setDepth(1);
     this.setScale(0.3);
     this.setRotation(3*Math.PI/2);
     this.projectiles = scene.add.group([], { runChildUpdate: true });
@@ -45,16 +47,18 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
       crash: scene.sound.add('crash'),
     }
     scene.anims.create({
-      key: 'ship-transform',
+      key: 'ship-open',
       frames: this.anims.generateFrameNumbers('player', { start: 4, end: 0, first: 4 }),
-      frameRate: 4,
-      repeat: -1,
+      frameRate: 20,
+      repeat: 0,
     });
-    this.setAngle(270);
-    this.setScale(0.25);
-    this.play('ship-transform');
+    scene.anims.create({
+      key: 'ship-close',
+      frames: this.anims.generateFrameNumbers('player', { start: 0, end: 4, first: 0 }),
+    });
+    this.play('ship-close');
   }
-
+  
   /**
    * Provides the sprite's center point on x and y
    *
@@ -63,7 +67,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   public get position(): { x: number, y: number } {
     return { x: this.x, y: this.y };
   }
-
+  
   /**
    * Provides the projectile group.
    *
@@ -83,12 +87,14 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.debris.add(debris);
     this.maybePlayCollectionAudio(debris.source);
   }
-
-  /** Fires the Gravity Cannon (if it is not in cooldown)
-  * @param projType Type of projectile: 'push' or 'pull
-  */
+  
+  /**
+   * Fires the Gravity Cannon (if it is not in cooldown)
+   * @param projType Type of projectile: 'push' or 'pull
+   */
   public fireGravityCannon(actionType: ActionType): void {
-    if (this.inFiringCooldown) return;
+    if (this.inFiringCooldown || this.crashed) return;
+    this.play('ship-open');
     this.gravCannonAction = actionType;
     this.isFiring = true;
   }
@@ -113,33 +119,39 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   public showCrash(): void {
     this.crashed = true;
     this.body.velocity.y = 0;
+    this.play('ship-close');
     this.sounds.crash.play();
   }
 
   public stopGravityCannon(): void {
+    this.play('ship-close');
     this.isFiring = false;
     this.inFiringCooldown = false;
+    this.projectileGroup.clear(false, true);
   }
 
   public update(): void {
     if (this.crashed) return;
-    this.body.velocity.y = this.debris.getRelativeMass() * 100;
-
-    if (this.isFiring) {
-      const projectile = new ProjectileSprite(this.scene, {
-        action: this.gravCannonAction,
-        start: {
-          x: this.position.x,
-          y: this.position.y,
-        },
-        end: {
-          x: this.scene.input.x,
-          y: this.scene.input.y,
-        }
-      });
-      this.projectileGroup.add(projectile);
-    }
+    if (this.isFiring) this.createProjectile();
+    this.body.velocity.y = this.debris.getRelativeMass() * SETTINGS.gravityFactor;
   }
+
+  private createProjectile() {
+    const projectile = new ProjectileSprite(this, this.scene, {
+      action: this.gravCannonAction,
+      start: {
+        x: this.position.x,
+        y: this.position.y,
+      },
+      end: {
+        x: this.scene.input.x,
+        y: this.scene.input.y,
+      }
+    });
+    this.projectileGroup.add(projectile);
+  }
+
+  private createProjectileThrottled = _.throttle(() => this.createProjectile(), 40);
 
   /**
    * Plays collection audio for the given debris source if audio is not disabled by global
