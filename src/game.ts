@@ -11,7 +11,9 @@ import {
 const plugins = SETTINGS.debug
   ? { scene: [ { key: 'DebugDrawPlugin', plugin: DebugDrawPlugin, mapping: 'debugDraw' } ] }
   : undefined;
+
 export namespace Planets {
+
   export class Game extends Phaser.Game {
     private static readonly WIDTH = 1200;
     private static readonly HEIGHT = 600;
@@ -19,7 +21,6 @@ export namespace Planets {
       type: Phaser.AUTO,
       backgroundColor: ' #000000',
       disableContextMenu: true,
-      noAudio: SETTINGS.disableAudio,
       scale: {
         mode: Phaser.Scale.FIT,
         parent: 'content',
@@ -35,6 +36,7 @@ export namespace Planets {
 
     constructor() {
       super(Game.config);
+      this.sound.mute = SETTINGS.disableAudio;
       this.scene.add('preloadScene', new PreloadScene());
       this.scene.add('mainScene', new MainScene());
       this.scene.add('gameOverScene', new GameOverScene());
