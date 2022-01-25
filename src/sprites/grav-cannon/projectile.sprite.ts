@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 
+import { SETTINGS } from '../../settings.config';
 import { ActionType } from './action-type.enum';
 import { PlayerSprite } from '../player.sprite';
 
@@ -17,7 +18,7 @@ type ProjectileSpriteConfig = {
 
 const CONFIG = {
   /** Maximum distance a projectile can get from its origin before dying */
-  beamLength: 100,
+  beamLength: SETTINGS.gravityGun.beamLength,
   /** Projectile movement speed */
   movementSpeed: 200,
 };
@@ -33,9 +34,7 @@ export class ProjectileSprite extends Phaser.GameObjects.Sprite {
     this.name = `${this.action}`;
     this.setScale(0.2);
     this.setAngle(90);
-    this.setTintFill(this.action === ActionType.Pull
-        ? 0xff3d3d
-        : 0x73e6d8);
+    this.setTintForAction(this.action);
     scene.physics.add.existing(this);
     scene.add.existing(this);
     scene.physics.moveTo(this, config.end.x, config.end.y, CONFIG.movementSpeed);
@@ -54,6 +53,22 @@ export class ProjectileSprite extends Phaser.GameObjects.Sprite {
   public update(): void {
     if (Phaser.Math.Distance.BetweenPoints(this, this.player) > CONFIG.beamLength) {
       this.destroy();
+    }
+  }
+
+  /**
+   * Sets the projectile's tint to the configured color for the given action.
+   *
+   * @param action action type to apply tint for
+   */
+  private setTintForAction(action: ActionType): void {
+    switch (action) {
+      case ActionType.Pull:
+        this.setTint(SETTINGS.colors.gravBeam.pull);
+        break;
+      case ActionType.Push:
+        this.setTint(SETTINGS.colors.gravBeam.push);
+        break;
     }
   }
 }

@@ -103,8 +103,8 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
    */
   private applyTint(): void {
     const sourceColorMap = {
-      [DebrisSource.Bottom]: SETTINGS.planetColors.bottom,
-      [DebrisSource.Top]: SETTINGS.planetColors.top,
+      [DebrisSource.Bottom]: SETTINGS.colors.planets.bottom,
+      [DebrisSource.Top]: SETTINGS.colors.planets.top,
     };
     this.setTint(sourceColorMap[this.debrisSource]);
   }
