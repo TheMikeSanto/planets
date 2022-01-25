@@ -5,9 +5,8 @@
   "author": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack",
-    "dev": "webpack",
-    "deploy": "webpack --config webpack.production.config.js"
+    "build:prod": "webpack --config webpack.production.config.js",
+    "dev": "webpack"
   },
   "license": "MIT",
   "devDependencies": {
