@@ -63,7 +63,16 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
     this.scaleFactor = this.determineScaleFactor();
     this.setScale(this.scaleFactor);
     this.applyTint();
+    this.getBody().setMaxVelocity(75, 20);
+    if (_.sample([false, false, false, true])) {
+      const velocityY = (1 - this.scaleFactor) * 10;
+      this.body.velocity.y = _.sample([true, false])
+        ? velocityY
+        : -velocityY;
+    }
     this.body.velocity.x = -(1 - this.scaleFactor)*100;
+    this.body.mass = 1 - this.scaleFactor;
+    (<Phaser.Physics.Arcade.Body> this.body).setBounce(0.5, 0.5);
   }
 
   /**
@@ -117,6 +126,10 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
   private determineScaleFactor(): number {
     const scaleFactor = Math.random() / randomInRange(2, 5);
     return Math.max(scaleFactor, CONFIG.minScaleFactor);
+  }
+
+  private getBody(): Phaser.Physics.Arcade.Body {
+    return <Phaser.Physics.Arcade.Body> this.body;
   }
 
   /**

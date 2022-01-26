@@ -13,7 +13,7 @@ export class MainScene extends Phaser.Scene {
   private player: PlayerSprite;
   private starField: Phaser.GameObjects.TileSprite;
   private cloudLayer: Phaser.GameObjects.TileSprite;
-  private planets: PlanetTileSprite[];
+  private planets: Phaser.GameObjects.Group;
   private trajectory: Phaser.Curves.Path;
   private graphics: Phaser.GameObjects.Graphics;
 
@@ -27,21 +27,19 @@ export class MainScene extends Phaser.Scene {
     this.cameras.main.centerOn(width * 0.5, height * 0.5);
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
     this.cloudLayer = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'clouds');
-    this.planets = [
+    this.planets = this.add.group([
       new PlanetTileSprite(this, 20, 'planet1', SETTINGS.colors.planets.top),
       new PlanetTileSprite(this, height - 20, 'planet1', SETTINGS.colors.planets.bottom),
-    ];
+    ]);
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
-    this.planets.forEach(body => {
-      const collider = this.physics.add.collider(this.player, body, (player, body) => {
-        collider.destroy();
-        this.doGameOver();
-      });
+    const collider = this.physics.add.collider(this.player, this.planets, (player, planet) => {
+      collider.destroy();
+      this.doGameOver();
     });
     this.physics.world.bounds.height = height - 80;
     this.graphics = this.add.graphics();
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
-    this.debrisManager = new DebrisManager(this, this.player);
+    this.debrisManager = new DebrisManager(this, this.player, this.planets);
     this.debrisManager.start();
     this.audio = this.sound.add('background-music', { volume: 0.5 })
     this.audio.play();
@@ -51,7 +49,9 @@ export class MainScene extends Phaser.Scene {
     const scrollFactor = 1;
     this.starField.tilePositionX += scrollFactor / 5;
     this.cloudLayer.tilePositionX += scrollFactor / 4;
-    this.planets.forEach(planet => planet.tilePositionX += scrollFactor);
+    this.planets.getChildren().forEach(planet => {
+      (<Phaser.GameObjects.TileSprite> planet).tilePositionX += scrollFactor;
+    });
     this.drawTrajectory();
     this.player.update();
     this.updatePlayerAim(delta);

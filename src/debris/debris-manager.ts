@@ -26,12 +26,14 @@ const CONFIG = {
 export class DebrisManager {
   private barrier: Phaser.GameObjects.Sprite;
   private group: Phaser.GameObjects.Group;
+  private planetGroup: Phaser.GameObjects.Group;
   private player: PlayerSprite;
   private scene: Phaser.Scene;
 
-  constructor(scene: Phaser.Scene, player: PlayerSprite) {
+  constructor(scene: Phaser.Scene, player: PlayerSprite, planetGroup: Phaser.GameObjects.Group) {
     this.scene = scene;
     this.player = player;
+    this.planetGroup = planetGroup;
     this.barrier = this.scene.add.sprite(-100, 0, 'barrier');
     this.scene.physics.add.existing(this.barrier);
     this.group = scene.add.group([], { runChildUpdate: true });
@@ -59,16 +61,20 @@ export class DebrisManager {
    * Creates collisions between the debris group and other related physics groups.
    */
   private registerGroupColliders(): void {
+    this.scene.physics.add.collider(this.group, this.planetGroup);
+    this.scene.physics.add.collider(this.group, this.group);
     this.scene.physics.add.overlap(this.group, this.player.projectileGroup,
       (debris, projectile) => {
       const type = projectile.name === `${ActionType.Pull}`
         ? ActionType.Pull
         : ActionType.Push;
+      const { x, y } = this.player.position;
       if (type === ActionType.Push) {
-        debris.body.velocity.x = -1 * debris.body.velocity.x;
+        this.scene.physics.moveTo(debris, x, y, -500)
       } else {
-        const { x, y } = this.player.position;
-        this.scene.physics.moveTo(debris, x, y, 500)
+        const speed = 100;
+        (<Phaser.Physics.Arcade.Body> debris.body).setMaxVelocity(speed, speed);
+        this.scene.physics.moveTo(debris, x, y, speed);
       }
     });
     this.scene.physics.add.collider(this.barrier, this.group, (barrier, body) => {
