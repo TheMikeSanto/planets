@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
 import { SETTINGS } from '../../settings.config';
@@ -62,13 +63,9 @@ export class ProjectileSprite extends Phaser.GameObjects.Sprite {
    * @param action action type to apply tint for
    */
   private setTintForAction(action: ActionType): void {
-    switch (action) {
-      case ActionType.Pull:
-        this.setTint(SETTINGS.colors.gravBeam.pull);
-        break;
-      case ActionType.Push:
-        this.setTint(SETTINGS.colors.gravBeam.push);
-        break;
-    }
+    const color = _.sample(action === ActionType.Pull
+      ? SETTINGS.colors.gravBeam.pull
+      : SETTINGS.colors.gravBeam.push);
+    this.setTint(color);
   }
 }

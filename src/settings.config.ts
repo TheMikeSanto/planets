@@ -3,8 +3,8 @@ export const SETTINGS = {
   /** Hex values for various colors */
   colors: {
     gravBeam: {
-      push: 0x73e6d8,
-      pull: 0xff3d3d,
+      push: [0x73e6d8, 0xb5fff6],
+      pull: [0xff3d3d, 0xff7a7a],
     },
     planets: {
       bottom: 0x2a24ee,
