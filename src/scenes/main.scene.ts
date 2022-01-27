@@ -8,9 +8,11 @@ import {
 } from '../sprites';
 
 export class MainScene extends Phaser.Scene {
-  private audio;
+  private backgroundMusic: Phaser.Sound.BaseSound;
   private debrisManager: DebrisManager;
+  private distanceScore: number = 0;
   private player: PlayerSprite;
+  private scoreCounter: Phaser.GameObjects.Text;
   private starField: Phaser.GameObjects.TileSprite;
   private cloudLayer: Phaser.GameObjects.TileSprite;
   private planets: Phaser.GameObjects.Group;
@@ -20,7 +22,7 @@ export class MainScene extends Phaser.Scene {
   constructor () {
     super('mainScene');
   }
-  
+
   public create(): void {
     this.cameras.main.fadeIn(2000);
     const { height, width } = this.scale;
@@ -38,15 +40,19 @@ export class MainScene extends Phaser.Scene {
     });
     this.physics.world.bounds.height = height - 80;
     this.graphics = this.add.graphics();
+    this.distanceScore = 0;
+    this.scoreCounter = this.add.text(0, height - 20, `${this.distanceScore}`);
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
     this.debrisManager = new DebrisManager(this, this.player, this.planets);
     this.debrisManager.start();
-    this.audio = this.sound.add('background-music', { volume: 0.5 })
-    this.audio.play();
+    this.backgroundMusic = this.sound.add('background-music', { volume: 0.5 })
+    this.backgroundMusic.play();
   }
-  
+
   public update(time, delta): void {
     const scrollFactor = 1;
+    this.distanceScore += scrollFactor;
+    this.scoreCounter.setText(`Distance: ${this.distanceScore}km`);
     this.starField.tilePositionX += scrollFactor / 5;
     this.cloudLayer.tilePositionX += scrollFactor / 4;
     this.planets.getChildren().forEach(planet => {
@@ -66,7 +72,8 @@ export class MainScene extends Phaser.Scene {
       this.cameras.main.pan(this.player.position.x, this.player.position.y, 2000);
       this.cameras.main.zoomTo(4, 3000);
       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
-        this.time.delayedCall(1000, () => this.scene.start('gameOverScene'));
+        this.time.delayedCall(1000,
+          () => this.scene.start('gameOverScene', { distance: this.distanceScore, player: this.player }));
       });
       this.cameras.main.fadeOut(2000, 0, 0, 0);
     }

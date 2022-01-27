@@ -9,6 +9,7 @@ export class DebrisCollection {
     [DebrisSource.Bottom]: <CollectedDebris[]> [],
     [DebrisSource.Top]: <CollectedDebris[]>[],
   };
+
   constructor() {}
 
   /**
@@ -18,7 +19,10 @@ export class DebrisCollection {
    */
   public add(debris: CollectedDebris): void {
     this.collection[debris.source].push(debris);
-    console.log(this.collection);
+  }
+
+  public getDebris(): { bottom: CollectedDebris[], top: CollectedDebris[] } {
+    return { bottom: this.collection[DebrisSource.Bottom], top: this.collection[DebrisSource.Top] };
   }
 
   /**

@@ -88,6 +88,10 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.maybePlayCollectionAudio(debris.source);
   }
   
+  public getDebris() {
+    return this.debris.getDebris();
+  }
+
   /**
    * Fires the Gravity Cannon (if it is not in cooldown)
    * @param projType Type of projectile: 'push' or 'pull

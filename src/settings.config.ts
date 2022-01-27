@@ -16,7 +16,7 @@ export const SETTINGS = {
   /** Affects the base scroll rate/debris spawn rate */
   gameSpeed: 1,
   /** Disables audio */
-  disableAudio: true,
+  disableAudio: false,
   /** Disables the failure state */
   disableFailure: false,
   /** Affects the amount of gravity per mass */
