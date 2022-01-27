@@ -34,8 +34,9 @@ export class DebrisManager {
     this.scene = scene;
     this.player = player;
     this.planetGroup = planetGroup;
-    this.barrier = this.scene.add.sprite(-100, 0, 'barrier');
+    this.barrier = this.scene.add.sprite(-100, this.scene.scale.height / 2, 'barrier');
     this.scene.physics.add.existing(this.barrier);
+    this.barrier.body['immovable'] = true;
     this.group = scene.add.group([], { runChildUpdate: true });
     this.registerGroupColliders();
   }
@@ -77,8 +78,8 @@ export class DebrisManager {
         this.scene.physics.moveTo(debris, x, y, speed);
       }
     });
-    this.scene.physics.add.collider(this.barrier, this.group, (barrier, body) => {
-      body.destroy();
+    this.scene.physics.add.collider(this.barrier, this.group, (barrier, debris) => {
+      this.group.remove(debris, true, true);
     });
   }
 
@@ -92,7 +93,7 @@ export class DebrisManager {
     const playerCollider = this.scene.physics.add.collider(this.player, debris, (player, body) => {
       playerCollider.destroy();
       this.player.collectDebris(debris.collectionData);
-      debris.destroy();
+      this.group.remove(debris, true, true);
     });
   }
 
