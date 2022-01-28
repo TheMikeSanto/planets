@@ -50,7 +50,7 @@ export class MainScene extends Phaser.Scene {
     this.backgroundMusic.play();
   }
 
-  public update(time, delta): void {
+  public update(): void {
     const scrollFactor = 1;
     this.distanceScore += scrollFactor;
     this.scoreCounter.setText(`Distance: ${this.distanceScore}km`);
@@ -61,7 +61,6 @@ export class MainScene extends Phaser.Scene {
     });
     this.drawTrajectory();
     this.player.update();
-    this.updatePlayerAim(delta);
   }
 
   /**
@@ -84,49 +83,11 @@ export class MainScene extends Phaser.Scene {
    * Draws the player's current trajectory on screen
    */
   private drawTrajectory(): void {
-    if (this.isPressed('w')) {
-      this.player.body.velocity.y -= 1;
-      console.log(this.player.body.velocity);
-    }
-    if (this.isPressed('s')) {
-      this.player.body.velocity.y += 1;
-      console.log(this.player.body.velocity);
-    }
     this.graphics.clear();
     this.graphics.lineStyle(1, 0xffffff, 0.75);
     // Figure out gravity, calculate endpoint and decay curve here
     this.trajectory.lineTo(1200, this.player.position.y);
     this.trajectory.draw(this.graphics);
-  }
-
-  /**
-   * Determines if the given key is currently pressed.
-   *
-   * @param key
-   * @returns `true` if key is pressed, `false` otherwise
-   */
-  private isPressed(key: string): boolean {
-    return this.input.keyboard.addKey(key).isDown;
-  }
-
-  /**
-   * Rotates the player to face the cursor
-   * @param delta time in ms from previous frame (from scene `update` function)
-   */
-  private updatePlayerAim(delta): void {
-    if (this.input.x !== 0 && this.input.y !== 0) {
-      const cursorAngle = this.getCursorAngle();
-      this.player.setPlayerRotation(cursorAngle - Math.PI/2, delta);
-    }
-    // this.player.setPlayerRotation(this.pointerTargetAngle - Math.PI/2);
-  }
-
-  /**
-   * Determine the angle between the player and mouse cursor
-   * @returns the angle between the player and the mouse cursor
-   */
-  private getCursorAngle(): number {
-    return Phaser.Math.Angle.Between(this.player.position.x, this.player.position.y, this.input.x, this.input.y);
   }
 
   /**

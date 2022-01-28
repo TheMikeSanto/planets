@@ -3,7 +3,7 @@ import * as Phaser from 'phaser';
 
 import { SETTINGS } from '../../settings.config';
 import { ActionType } from './action-type.enum';
-import { PlayerSprite } from '../player.sprite';
+import { PlayerSprite } from '../player/player.sprite';
 
 type ProjectileSpriteConfig = {
   action: ActionType,
