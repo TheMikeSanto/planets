@@ -43,6 +43,7 @@ export class MainScene extends Phaser.Scene {
     this.distanceScore = 0;
     this.scoreCounter = this.add.text(0, height - 20, `${this.distanceScore}`);
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
+    this.initMenuButton();
     this.debrisManager = new DebrisManager(this, this.player, this.planets);
     this.debrisManager.start();
     this.backgroundMusic = this.sound.add('background-music', { volume: 0.5 })
@@ -128,4 +129,21 @@ export class MainScene extends Phaser.Scene {
     return Phaser.Math.Angle.Between(this.player.position.x, this.player.position.y, this.input.x, this.input.y);
   }
 
+  /**
+   * Creates a menu button and wires up event handlers.
+   */
+  private initMenuButton(): void {
+    const { height, width } = this.scale;
+    const pauseButton = this.add.sprite(width - 30, height - 20, 'menu')
+    .setTintFill(1)
+    .setTint(0xffffff)
+    .setInteractive({ useHandCursor: true })
+    .on('pointerover', () => pauseButton.setTint(0x7d7d7d))
+    .on('pointerout', () => pauseButton.setTint(0xffffff))
+    .on('pointerdown', () => {
+      this.game.scene.isPaused('mainScene')
+        ? this.game.scene.resume('mainScene')
+        : this.game.scene.pause('mainScene')
+    });
+  }
 }
