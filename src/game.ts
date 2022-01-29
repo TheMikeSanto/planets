@@ -38,6 +38,7 @@ export namespace Planets {
 
     constructor() {
       super(Game.config);
+      this.sound.volume = 0.3;
       this.sound.mute = SETTINGS.disableAudio;
       this.scene.add('pauseScene', new PauseScene());
       this.scene.add('preloadScene', new PreloadScene());
