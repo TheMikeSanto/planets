@@ -41,8 +41,9 @@ export class MainScene extends Phaser.Scene {
     this.physics.world.bounds.height = height - 80;
     this.graphics = this.add.graphics();
     this.distanceScore = 0;
-    this.scoreCounter = this.add.text(0, height - 20, `${this.distanceScore}`);
+
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
+    this.scoreCounter = this.initScoreCounter(height - 22);
     this.initMenuButton();
     this.debrisManager = new DebrisManager(this, this.player, this.planets);
     this.debrisManager.start();
@@ -53,7 +54,7 @@ export class MainScene extends Phaser.Scene {
   public update(): void {
     const scrollFactor = 1;
     this.distanceScore += scrollFactor;
-    this.scoreCounter.setText(`Distance: ${this.distanceScore}km`);
+    this.scoreCounter.setText(`${this.distanceScore} km`);
     this.starField.tilePositionX += scrollFactor / 5;
     this.cloudLayer.tilePositionX += scrollFactor / 4;
     this.planets.getChildren().forEach(planet => {
@@ -107,5 +108,18 @@ export class MainScene extends Phaser.Scene {
       this.scene.sendToBack();
       this.scene.pause();
     });
+  }
+
+  private initScoreCounter(y: number): Phaser.GameObjects.Text {
+    const padding = 10;
+    const scoreCounterLabel = this.add.text(padding, y, 'Distance: ', {
+      fontFamily: 'ROGFonts',
+      fontSize: '24px',
+      
+    }).setOrigin(0, 0.5);
+    return this.add.text(scoreCounterLabel.width + padding, y, `${this.distanceScore}`, {
+      fontFamily: 'ROGFonts',
+      fontSize: '24px',
+    }).setOrigin(0, 0.5);
   }
 }
