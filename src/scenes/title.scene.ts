@@ -1,6 +1,8 @@
 import * as Phaser from 'phaser';
 
 export class TitleScene extends Phaser.Scene {
+  private clickToStartText: Phaser.GameObjects.Text;
+
   constructor() {
     super('titleScene');
   }
@@ -16,9 +18,15 @@ export class TitleScene extends Phaser.Scene {
         launchSound.play();
         this.scene.start('mainScene');
       });
-    this.add.text(420, 400, 'click to start', {
-      fontFamily: 'Arial',
+    this.clickToStartText = this.add.text(420, 400, 'click to start', {
+      fontFamily: 'ROGFonts',
       fontSize: '24px',
+    }).setAlpha(0);
+    this.tweens.add({
+      targets: this.clickToStartText,
+      alpha: { value: 1, duration: 1500, ease: 'Power1' },
+      yoyo: true,
+      loop: -1,
     });
   }
 }

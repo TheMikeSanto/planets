@@ -75,7 +75,7 @@ export class GameOverScene extends Phaser.Scene {
   private drawScoreboard(): void {
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
     this.add.text(screenCenterX, 100, 'GAME OVER', { fontSize: '72px', fontFamily: 'ROGFonts '})
-    .setOrigin(0.5);
+      .setOrigin(0.5);
     this.add.text(screenCenterX, 200, [
       `Distance: ${this.scores.distance} km`,
       `Mass (bottom): ${this.scores.mass.bottom} tons`,
