@@ -16,6 +16,7 @@ export class MainScene extends Phaser.Scene {
   private starField: Phaser.GameObjects.TileSprite;
   private cloudLayer: Phaser.GameObjects.TileSprite;
   private planets: Phaser.GameObjects.Group;
+  private bigPlanet: Phaser.GameObjects.Sprite;
   private trajectory: Phaser.Curves.Path;
   private graphics: Phaser.GameObjects.Graphics;
 
@@ -33,6 +34,8 @@ export class MainScene extends Phaser.Scene {
       new PlanetTileSprite(this, 20, 'planet1', SETTINGS.colors.planets.top),
       new PlanetTileSprite(this, height - 20, 'planet1', SETTINGS.colors.planets.bottom),
     ]);
+    this.bigPlanet = this.add.sprite(width * 0.5, -4450, 'big-planet')
+      .setScale(10);
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
     const collider = this.physics.add.collider(this.player, this.planets, (player, planet) => {
       collider.destroy();
@@ -60,6 +63,7 @@ export class MainScene extends Phaser.Scene {
     this.planets.getChildren().forEach(planet => {
       (<Phaser.GameObjects.TileSprite> planet).tilePositionX += scrollFactor;
     });
+    this.bigPlanet.rotation += scrollFactor / 1000;
     this.drawTrajectory();
     this.player.update();
   }
