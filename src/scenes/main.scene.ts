@@ -135,15 +135,16 @@ export class MainScene extends Phaser.Scene {
   private initMenuButton(): void {
     const { height, width } = this.scale;
     const pauseButton = this.add.sprite(width - 30, height - 20, 'menu')
+    .setScale(0.5)
     .setTintFill(1)
     .setTint(0xffffff)
     .setInteractive({ useHandCursor: true })
     .on('pointerover', () => pauseButton.setTint(0x7d7d7d))
     .on('pointerout', () => pauseButton.setTint(0xffffff))
     .on('pointerdown', () => {
-      this.game.scene.isPaused('mainScene')
-        ? this.game.scene.resume('mainScene')
-        : this.game.scene.pause('mainScene')
+      this.scene.launch('pauseScene');
+      this.scene.sendToBack();
+      this.scene.pause();
     });
   }
 }

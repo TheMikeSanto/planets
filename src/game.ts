@@ -5,6 +5,7 @@ import { SETTINGS } from './settings.config';
 import {
   GameOverScene,
   MainScene,
+  PauseScene,
   PreloadScene,
 } from './scenes';
 
@@ -37,6 +38,7 @@ export namespace Planets {
     constructor() {
       super(Game.config);
       this.sound.mute = SETTINGS.disableAudio;
+      this.scene.add('pauseScene', new PauseScene());
       this.scene.add('preloadScene', new PreloadScene());
       this.scene.add('mainScene', new MainScene());
       this.scene.add('gameOverScene', new GameOverScene());
