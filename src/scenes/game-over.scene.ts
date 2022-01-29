@@ -74,7 +74,7 @@ export class GameOverScene extends Phaser.Scene {
    */
   private drawScoreboard(): void {
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-    this.add.text(screenCenterX, 100, 'GAME OVER', { fontSize: '72px', fontFamily: 'Arial '})
+    this.add.text(screenCenterX, 100, 'GAME OVER', { fontSize: '72px', fontFamily: 'ROGFonts '})
     .setOrigin(0.5);
     this.add.text(screenCenterX, 200, [
       `Distance: ${this.scores.distance} km`,
@@ -87,11 +87,11 @@ export class GameOverScene extends Phaser.Scene {
     }).setOrigin(0.5);
     this.add.text(screenCenterX, 300, `TOTAL: ${this.scores.total}`, {
       fontSize: '48px',
-      fontFamily: 'Arial'
+      fontFamily: 'ROGFonts, Arial'
     }).setOrigin(0.5);
     this.add.text(screenCenterX, this.scale.height - 40, 'Press any button to continue', {
       fontSize: '16px',
-      fontFamily: 'Arial',
+      fontFamily: 'ROGFonts, Arial',
     }).setOrigin(0.5);
   }
 }

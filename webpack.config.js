@@ -35,7 +35,7 @@ module.exports = {
         { from: 'assets', to: 'assets' },
       ],
     }),
-    new HtmlWebpackPlugin({ title: 'Planets' }),
+    new HtmlWebpackPlugin({ title: 'Frame Drag' }),
     new BrowserSyncPlugin({
       host: 'localhost',
       port: 3000,
@@ -54,7 +54,11 @@ module.exports = {
       {
         test: [/\.vert$/, /\.frag$/],
         use: 'raw-loader'
-      }
+      },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
     ]
   },
   resolve: {
