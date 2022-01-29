@@ -144,16 +144,18 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   }
 
   private createProjectile() {
+    const projectileTarget = {
+      // requires Pi/2 adjustment to offset original sprite rotation
+      x: this.position.x + 100*Math.cos(this.rotation + Math.PI/2),
+      y: this.position.y + 100*Math.sin(this.rotation + Math.PI/2)
+    }
     const projectile = new ProjectileSprite(this, this.scene, {
       action: this.gravCannonAction,
       start: {
         x: this.position.x,
         y: this.position.y,
       },
-      end: {
-        x: this.scene.input.x,
-        y: this.scene.input.y,
-      }
+      end: projectileTarget
     });
     this.projectileGroup.add(projectile);
   }
