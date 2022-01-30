@@ -50,7 +50,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('starfield', 'assets/starfield.png');
     this.load.image('title-screen-background', 'assets/title-screen.png');
     this.load.image('warp-core', 'assets/warp-core.png');
-    this.load.audio('background-music', 'assets/audio/background-music.wav');
+    this.load.audio('background-music', 'assets/audio/background-music.mp3');
     this.load.audio('crash', 'assets/audio/crash.mp3');
     this.load.audio('launch', 'assets/audio/launch.wav');
     this.load.audio('low-bump', 'assets/audio/low-bump.wav');
