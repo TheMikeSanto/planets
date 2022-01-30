@@ -13,6 +13,7 @@ type Scores = {
 }
 export class GameOverScene extends Phaser.Scene {
   private background: Phaser.GameObjects.TileSprite;
+  private launchSound: Phaser.Sound.BaseSound;
   private scores: Scores;
 
   constructor() {
@@ -26,11 +27,9 @@ export class GameOverScene extends Phaser.Scene {
     this.background = this.add.tileSprite(midpointX, midpointY, 1200, 600,
       'background-game-over');
     this.drawScoreboard();
-    const launchSound = this.sound.add('launch');
-    this.input.on('pointerdown', () => {
-      launchSound.play();
-      this.scene.start('mainScene');
-    });
+    this.launchSound = this.sound.add('launch');
+    this.input.on('pointerdown', () => this.restartGame());
+    this.input.keyboard.on('keydown', () => this.restartGame());
   }
 
   public init(data: { distance: number, player: PlayerSprite }): void {
@@ -93,5 +92,10 @@ export class GameOverScene extends Phaser.Scene {
       fontSize: '16px',
       fontFamily: 'ROGFonts, Arial',
     }).setOrigin(0.5);
+  }
+
+  private restartGame(): void {
+    this.launchSound.play();
+    this.scene.start('mainScene');
   }
 }
