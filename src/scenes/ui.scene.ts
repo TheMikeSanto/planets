@@ -1,7 +1,8 @@
-import { SETTINGS } from '../settings.config';
-import { ActionType } from '@sprites/grav-cannon';
 import * as _ from 'lodash';
 import * as Phaser from 'phaser';
+
+import { SETTINGS } from '../settings.config';
+import { detectMobile } from '../utils';
 
 type CounterWithLabel = {
   counter: Phaser.GameObjects.Text,
@@ -31,7 +32,7 @@ export class UiScene extends Phaser.Scene {
     this.fullscreenButton = this.initFullscreenButton();
     this.scoreCounter = this.initScoreCounter(height - 22);
     this.warpCores = this.initWarpCores(this.scoreCounter.counter.getTopCenter().y - 20);
-    this.isTouchEnabled = !this.sys.game.device.os.desktop; // TODO: extract this out somewhere? it's repeated elsewhere once. also might need to be more specific w/ how it's derived
+    this.isTouchEnabled = detectMobile();
     if (this.isTouchEnabled) this.initTouchControls();
   }
 
@@ -45,6 +46,7 @@ export class UiScene extends Phaser.Scene {
       warpCore.setTint(0x7d7d7d);
     })
   }
+
 
   /**
    * Creates a menu button and wires up event handlers.
@@ -69,41 +71,42 @@ export class UiScene extends Phaser.Scene {
   /**
    * Creates a menu button and wires up event handlers.
    */
-     private initFullscreenButton(): Phaser.GameObjects.Sprite {
-      const { height, width } = this.scale;
-      const fullscreenButton = this.add.sprite(width - 20, 40, 'fullscreen-button')
-        .setScale(0.7)
-        .setTintFill(1)
-        .setTint(0xffffff)
-        .setAlpha(0.7)
-        .setInteractive({ useHandCursor: true })
-        .on('pointerover', () => fullscreenButton.setTint(0x7d7d7d))
-        .on('pointerout', () => fullscreenButton.setTint(0xffffff))
-        .on('pointerdown', () => {
-          this.events.emit('fullscreenButtonClicked');
-          if (!this.scale.isFullscreen) {
-            this.scale.startFullscreen();
-          } else {
-            this.scale.stopFullscreen();
-          }
-        });
-      return fullscreenButton;
-    }
+    private initFullscreenButton(): Phaser.GameObjects.Sprite {
+    const { height, width } = this.scale;
+    const fullscreenButton = this.add.sprite(width - 20, 40, 'fullscreen-button')
+      .setScale(0.7)
+      .setTintFill(1)
+      .setTint(0xffffff)
+      .setAlpha(0.7)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerover', () => fullscreenButton.setTint(0x7d7d7d))
+      .on('pointerout', () => fullscreenButton.setTint(0xffffff))
+      .on('pointerdown', () => {
+        this.events.emit('fullscreenButtonClicked');
+        if (!this.scale.isFullscreen) {
+          this.scale.startFullscreen();
+        } else {
+          this.scale.stopFullscreen();
+        }
+      });
+    return fullscreenButton;
+  }
 
   /**
    * Creates a menu button and wires up event handlers.
    */
-     private initWarpCoreButton(warpCoreX:number, warpCoreY:number, warpCoreWidth: number, warpCoreHeight: number): Phaser.GameObjects.Rectangle {
-      const warpCoreTotalAreaWidth = (warpCoreWidth * 3) + CONFIG.padding * 2;
-      const warpCoreButton = this.add.rectangle(warpCoreX, warpCoreY, warpCoreTotalAreaWidth, warpCoreHeight)
-        .setFillStyle(0xffffff)
-        .setAlpha(0.01)
-        .setInteractive()
-        .on('pointerdown', () => {
-          this.events.emit('usedWarpCoreButton');
-        });
-      return warpCoreButton;
-    }
+    private initWarpCoreButton(warpCoreX:number, warpCoreY:number, warpCoreWidth: number,
+      warpCoreHeight: number): Phaser.GameObjects.Rectangle {
+    const warpCoreTotalAreaWidth = (warpCoreWidth * 3) + CONFIG.padding * 2;
+    const warpCoreButton = this.add.rectangle(warpCoreX, warpCoreY, warpCoreTotalAreaWidth, warpCoreHeight)
+      .setFillStyle(0xffffff)
+      .setAlpha(0.01)
+      .setInteractive()
+      .on('pointerdown', () => {
+        this.events.emit('usedWarpCoreButton');
+      });
+    return warpCoreButton;
+  }
 
 
   private initTouchControls(): void {

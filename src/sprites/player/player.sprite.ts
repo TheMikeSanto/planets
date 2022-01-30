@@ -133,19 +133,11 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
    *
    * @param actionType
    */
-  public startGravityCannon(actionType?: ActionType): void {
+  public startGravityCannon(actionType: ActionType): void {
     if (this.inFiringCooldown || this.crashed) return;
     this.play('ship-open');
-    if (actionType) this.gravCannonAction = actionType;
-    this.isFiring = true;
-  }
-  
-  /**
-   * Toggles Gravity Cannon action state (for mobile controls)
-   * @param actionType 
-   */
-  public setGravCannonAction(actionType: ActionType): void {
     this.gravCannonAction = actionType;
+    this.isFiring = true;
   }
 
   public startRotation(direction: RotationDirection): void {

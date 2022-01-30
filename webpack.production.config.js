@@ -29,7 +29,7 @@ module.exports = {
   },
   plugins: [
     definePlugin,
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new CopyPlugin({
       patterns: [
         { from: 'assets', to: 'assets' },

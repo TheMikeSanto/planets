@@ -9,6 +9,7 @@ import {
 
 export class ControlManager {
   private readonly events: Phaser.Events.EventEmitter = new Phaser.Events.EventEmitter();
+  private gravCannonAction: ActionType = ActionType.Pull;
   private readonly keys: {
     w: Phaser.Input.Keyboard.Key,
     a: Phaser.Input.Keyboard.Key,
@@ -19,7 +20,6 @@ export class ControlManager {
   private player: PlayerSprite;
   private scene: Phaser.Scene;
   private ui: UiScene;
-  private isTouchEnabled: Boolean;
 
   constructor(player: PlayerSprite, ui: UiScene) {
     this.player = player;
@@ -35,8 +35,6 @@ export class ControlManager {
     this.registerKeyboardListeners();
     this.registerCursorInputListeners();
     this.registerTouchInputListeners();
-    this.isTouchEnabled = !this.scene.sys.game.device.os.desktop; // TODO: extract this out somewhere? it's repeated elsewhere twice. also might need to be more specific w/ how it's derived
-
   }
 
   public on(event: string, callback: Function): void {
@@ -57,12 +55,10 @@ export class ControlManager {
   }
 
   private registerCursorInputListeners(): void {
-    this.scene.input.on('pointerdown', pointer => {
-      if (!this.isTouchEnabled) {
-        // TODO: this smells
-        if (pointer.rightButtonDown()) this.emit('gravBeamStart', ActionType.Push);
-        if (pointer.leftButtonDown()) this.emit('gravBeamStart', ActionType.Pull);
-      }
+    this.scene.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.rightButtonDown()) this.emit('gravBeamStart', ActionType.Push);
+      if (pointer.leftButtonDown()) this.emit('gravBeamStart', ActionType.Pull);
+      if (pointer.wasTouch) this.emit('gravBeamStart', this.gravCannonAction);
     });
     this.scene.input.on('pointerup', () => this.emit('gravBeamStop'));
     this.scene.input.on('pointermove', () => {
@@ -74,13 +70,9 @@ export class ControlManager {
 
   private registerTouchInputListeners(): void {
     this.scene.input.addPointer(1); // register for multitouch events
-    this.ui.events.on('setGravActionPushButton', () => this.emit('setGravAction', ActionType.Push));
-    this.ui.events.on('setGravActionPullButton', () => this.emit('setGravAction', ActionType.Pull));
-    this.ui.events.on('usedWarpCoreButton', () => this.emit('usedWarpCore'));
-    this.scene.input.on('pointerdown', () => {
-      // TODO: this smells
-      if (this.isTouchEnabled) this.emit('gravBeamStart');
-    });
+    this.ui.events.on('setGravActionPushButton', () => this.gravCannonAction = ActionType.Push);
+    this.ui.events.on('setGravActionPullButton', () => this.gravCannonAction = ActionType.Pull);
+    this.ui.events.on('usedWarpCoreButton', () => this.emit('useWarpCore'));
   }
 
   private registerKeyboardListeners(): void {

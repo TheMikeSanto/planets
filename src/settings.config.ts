@@ -30,6 +30,6 @@ export const SETTINGS = {
     powerDistanceRatio: 10,
     cooldownTime: 1000,
     mouseCursorRotationSpeed: Math.PI/2, // radians/second
-    touchRotationSpeed: 2*Math.PI/2 // radians/second
+    touchRotationSpeed: 3*Math.PI/2 // radians/second
   },
 } as const;
