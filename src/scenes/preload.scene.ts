@@ -12,6 +12,7 @@ export class PreloadScene extends Phaser.Scene {
 
   public preload(): void {
     const { width, height } = this.scale;
+    this.scale.lockOrientation('landscape');
     const loadingIndicator = this.add.text(width / 2, height / 2, 'loading', {
       font: 'bold 24px Arial',
     }).setAlpha(0);
@@ -54,5 +55,9 @@ export class PreloadScene extends Phaser.Scene {
     this.load.audio('low-bump', 'assets/audio/low-bump.wav');
     this.load.audio('plop', 'assets/audio/plop.wav');
     this.load.audio('warp', 'assets/audio/warp.wav');
+    this.load.on('complete', () => {
+      console.log('complete');
+      this.scene.start('titleScene');
+    });
   }
 }
