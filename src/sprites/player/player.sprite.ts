@@ -2,7 +2,6 @@ import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
 import { SETTINGS } from '../../settings.config';
-import { ControlManager } from './control-manager';
 import { RotationDirection } from './rotation-direction.enum';
 import {
   CollectedDebris,
@@ -17,12 +16,12 @@ import {
 const ROTATION_SPEED = 1 * Math.PI; // radians/second
 
 export class PlayerSprite extends Phaser.GameObjects.Sprite {
-  private controls: ControlManager;
   private crashed = false;
   private readonly debris: DebrisCollection = new DebrisCollection();
   private gravCannonAction: ActionType = ActionType.Pull;
   private inFiringCooldown = false;
   private isFiring = false;
+  private isReturningToCenter = false;
   private isRotating = false;
   private projectiles: Phaser.GameObjects.Group;
   private rotationDirection: RotationDirection;
@@ -31,6 +30,8 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     collectionTop: Phaser.Sound.BaseSound,
     crash: Phaser.Sound.BaseSound,
   };
+  private startPosition;
+  private warpCoreCount = 3;
 
   constructor(scene: Phaser.Scene, x, y) {
     super(scene, x, y, 'player', 4);
@@ -40,15 +41,8 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.setDepth(1);
     this.setScale(0.3);
     this.setRotation(3*Math.PI/2);
+    this.startPosition = { x, y };
     this.projectiles = scene.add.group([], { runChildUpdate: true });
-    this.controls = new ControlManager(this);
-    this.controls.on('gravBeamStart', actionType => {
-      this.fireGravityCannon(actionType);
-    });
-    this.controls.on('gravBeamStop', () => this.stopGravityCannon());
-    this.controls.on('rotatePlayerTo', angle => this.setPlayerRotation(angle));
-    this.controls.on('rotatePlayerStart', direction => this.startRotation(direction));
-    this.controls.on('rotatePlayerStop', () => this.stopRotation())
     this.sounds = {
       collectionBottom: scene.sound.add('low-bump'),
       collectionTop: scene.sound.add('plop'),
@@ -100,15 +94,27 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     return this.debris.getDebris();
   }
 
+  public returnToCenter(): void {
+    this.isReturningToCenter = true;
+    (<Phaser.Physics.Arcade.Body> this.body).setVelocity(0, 0);
+    this.scene.physics.moveTo(this, this.startPosition.x, this.startPosition.y, 200, 1000)
+    this.scene.time.addEvent({
+      callback: () => this.isReturningToCenter = false,
+      delay: 1000,
+    });
+  }
+
   /**
-   * Fires the Gravity Cannon (if it is not in cooldown)
-   * @param projType Type of projectile: 'push' or 'pull
+   * Sets the rotation of the Player + Grav Gun Field together
+   * @param angle angle in radians
    */
-  public fireGravityCannon(actionType: ActionType): void {
-    if (this.inFiringCooldown || this.crashed) return;
-    this.play('ship-open');
-    this.gravCannonAction = actionType;
-    this.isFiring = true;
+   public setPlayerRotation(angle: number) {
+    if (this.crashed) return;
+    this.rotation = Phaser.Math.Angle.RotateTo(
+      this.rotation,
+      angle,
+      ROTATION_SPEED * 0.01,
+    );
   }
 
   /**
@@ -119,6 +125,29 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.body.velocity.y = 0;
     this.play('ship-close');
     this.sounds.crash.play();
+  }
+
+  /**
+   * Fires the Gravity Cannon (if it is not in cooldown)
+   *
+   * @param projType Type of projectile: 'push' or 'pull
+   */
+  public startGravityCannon(actionType: ActionType): void {
+    if (this.inFiringCooldown || this.crashed) return;
+    this.play('ship-open');
+    this.gravCannonAction = actionType;
+    this.isFiring = true;
+  }
+
+  public startRotation(direction: RotationDirection): void {
+    if (this.crashed) return;
+    this.isRotating = true;
+    this.rotationDirection = direction;
+  }
+
+  public stopRotation(): void {
+    this.isRotating = false;
+    this.rotationDirection = undefined;
   }
 
   public stopGravityCannon(): void {
@@ -132,7 +161,15 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     if (this.crashed) return;
     if (this.isFiring) this.createProjectile();
     if (this.isRotating) this.adjustRotation(this.rotationDirection);
-    this.body.velocity.y = this.debris.getRelativeMass() * SETTINGS.gravityFactor;
+    if (!this.isReturningToCenter) {
+      this.body.velocity.y = this.debris.getRelativeMass() * SETTINGS.gravityFactor;
+    }
+  }
+
+  public useWarpCore(): number {
+    this.warpCoreCount = --this.warpCoreCount || 0;
+    this.debris.addWarpCore();
+    return this.warpCoreCount;
   }
 
   private adjustRotation(direction: RotationDirection): void {
@@ -171,29 +208,5 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     (source === DebrisSource.Bottom 
       ? this.sounds.collectionBottom
       : this.sounds.collectionTop).play();
-  }
-
-  private startRotation(direction: RotationDirection): void {
-    if (this.crashed) return;
-    this.isRotating = true;
-    this.rotationDirection = direction;
-  }
-
-  private stopRotation(): void {
-    this.isRotating = false;
-    this.rotationDirection = undefined;
-  }
-
-  /**
-   * Sets the rotation of the Player + Grav Gun Field together
-   * @param angle angle in radians
-   */
-   public setPlayerRotation(angle: number) {
-    if (this.crashed) return;
-    this.rotation = Phaser.Math.Angle.RotateTo(
-      this.rotation,
-      angle,
-      ROTATION_SPEED * 0.01,
-    );
   }
 }

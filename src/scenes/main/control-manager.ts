@@ -1,8 +1,10 @@
 import * as Phaser from 'phaser';
 
-import { ActionType } from '../grav-cannon/action-type.enum';
-import { PlayerSprite } from './player.sprite';
-import { RotationDirection } from './rotation-direction.enum';
+import { ActionType } from '../../sprites/grav-cannon';
+import {
+  PlayerSprite,
+  RotationDirection,
+} from '../../sprites/player';
 
 export class ControlManager {
   private readonly events: Phaser.Events.EventEmitter = new Phaser.Events.EventEmitter();
@@ -11,6 +13,7 @@ export class ControlManager {
     a: Phaser.Input.Keyboard.Key,
     s: Phaser.Input.Keyboard.Key,
     d: Phaser.Input.Keyboard.Key,
+    space: Phaser.Input.Keyboard.Key,
   };
   private player: PlayerSprite;
   private scene: Phaser.Scene;
@@ -23,6 +26,7 @@ export class ControlManager {
       a: this.scene.input.keyboard.addKey('A'),
       s: this.scene.input.keyboard.addKey('S'),
       d: this.scene.input.keyboard.addKey('D'),
+      space: this.scene.input.keyboard.addKey('SPACE'),
     };
     this.registerKeyboardListeners();
     this.registerInputListeners();
@@ -66,6 +70,7 @@ export class ControlManager {
     this.keys.w.on('up', () => this.emit('gravBeamStop'));
     this.keys.s.on('down', () => this.emit('gravBeamStart', ActionType.Pull));
     this.keys.s.on('up', () => this.emit('gravBeamStop'));
+    this.keys.space.on('down', () => this.emit('usedWarpCore'));
     this.keys.a.on('down', () => this.emit('rotatePlayerStart', RotationDirection.Left));
     this.keys.a.on('up', () => this.emit('rotatePlayerStop'));
     this.keys.d.on('down', () => this.emit('rotatePlayerStart', RotationDirection.Right));

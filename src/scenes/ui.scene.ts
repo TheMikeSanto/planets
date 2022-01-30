@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
 type CounterWithLabel = {
@@ -5,9 +6,13 @@ type CounterWithLabel = {
   label: Phaser.GameObjects.Text,
 }
 
+const CONFIG = {
+  padding: 10,
+} as const;
 export class UiScene extends Phaser.Scene {
   private menuButton: Phaser.GameObjects.Sprite;
   private scoreCounter: CounterWithLabel;
+  private warpCores: Phaser.GameObjects.Sprite[];
 
   constructor() {
     super('uiScene');
@@ -18,10 +23,18 @@ export class UiScene extends Phaser.Scene {
     this.scene.bringToTop(this);
     this.menuButton = this.initMenuButton();
     this.scoreCounter = this.initScoreCounter(height - 22);
+    this.warpCores = this.initWarpCores(this.scoreCounter.counter.getTopCenter().y - 20);
   }
 
   public updateScore(score: number): void {
     this.scoreCounter?.counter.setText(`${score} km`);
+  }
+
+  public updateWarpCoreCount(count: number): void {
+    this.warpCores.slice(-(3 -count)).forEach(warpCore => {
+      warpCore.setTintFill(1);
+      warpCore.setTint(0x7d7d7d);
+    })
   }
 
   /**
@@ -45,17 +58,28 @@ export class UiScene extends Phaser.Scene {
   }
 
   private initScoreCounter(y: number): CounterWithLabel {
-    const padding = 10;
     const style = {
       fontFamily: 'ROGFonts',
       fontSize: '24px',
       stroke: '#000000',
       strokeThickness: 4,
     };
-    const label = this.add.text(padding, y, 'Distance: ', style)
+    const label = this.add.text(CONFIG.padding, y, 'Distance: ', style)
       .setOrigin(0, 0.5);
-    const counter = this.add.text(label.width + padding, y, `0`, style)
+    const counter = this.add.text(label.width + CONFIG.padding, y, `0`, style)
       .setOrigin(0, 0.5);
     return { label, counter };
+  }
+
+  private initWarpCores(y: number): Phaser.GameObjects.Sprite[] {
+    const createSprite = (x) => {
+      const sprite = this.add.sprite(x, y, 'warp-core');
+      sprite.setScale(0.2);
+      return sprite;
+    }
+    const first = createSprite(30);
+    const second = createSprite(first.getRightCenter().x + CONFIG.padding);
+    const third = createSprite(second.getRightCenter().x + CONFIG.padding)
+    return [ first, second, third ];
   }
 }

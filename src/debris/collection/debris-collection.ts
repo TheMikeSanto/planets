@@ -9,7 +9,7 @@ export class DebrisCollection {
     [DebrisSource.Bottom]: <CollectedDebris[]> [],
     [DebrisSource.Top]: <CollectedDebris[]>[],
   };
-
+  private readonly warpCoreMass = [];
   constructor() {}
 
   /**
@@ -19,6 +19,11 @@ export class DebrisCollection {
    */
   public add(debris: CollectedDebris): void {
     this.collection[debris.source].push(debris);
+  }
+
+  public addWarpCore(): void {
+    const currentRelativeMass = this.getRelativeMass();
+    this.warpCoreMass.push(-currentRelativeMass);
   }
 
   public getDebris(): { bottom: CollectedDebris[], top: CollectedDebris[] } {
@@ -37,7 +42,7 @@ export class DebrisCollection {
       .map(debris => debris.mass)
       .sum()
       .value();
-    // console.log('Bottom mass: ', bottomMass, 'Top mass: ', topMass, 'Relative: ', bottomMass - topMass);
-    return bottomMass - topMass;
+    const warpCoreMass = _.sum(this.warpCoreMass);
+    return bottomMass - topMass + warpCoreMass;
   }
 }

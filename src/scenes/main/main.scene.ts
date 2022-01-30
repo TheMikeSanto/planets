@@ -1,15 +1,17 @@
 import * as Phaser from 'phaser';
 
-import { DebrisManager } from '../debris';
-import { SETTINGS } from '../settings.config';
+import { ControlManager } from './control-manager';
+import { DebrisManager } from '../../debris';
+import { SETTINGS } from '../../settings.config';
 import {
   PlanetSprite,
   PlayerSprite,
-} from '../sprites';
-import { UiScene } from './ui.scene';
+} from '../../sprites';
+import { UiScene } from '../ui.scene';
 
 export class MainScene extends Phaser.Scene {
   private backgroundMusic: Phaser.Sound.BaseSound;
+  private controls: ControlManager;
   private debrisManager: DebrisManager;
   private crashed = false;
   private distanceScore: number = 0;
@@ -47,6 +49,8 @@ export class MainScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
     this.distanceScore = 0;
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
+    this.controls = new ControlManager(this.player);
+    this.registerControlHandlers();
     this.ui.events.on('menuButtonClicked', () => this.scene.pause());
     this.debrisManager = new DebrisManager(this, this.player, this.planets);
     this.debrisManager.start();
@@ -97,5 +101,19 @@ export class MainScene extends Phaser.Scene {
     // Figure out gravity, calculate endpoint and decay curve here
     this.trajectory.lineTo(1200, this.player.position.y);
     this.trajectory.draw(this.graphics);
+  }
+
+  private registerControlHandlers(): void {
+    this.controls.on('gravBeamStart', actionType => this.player.startGravityCannon(actionType));
+    this.controls.on('gravBeamStop', () => this.player.stopGravityCannon());
+    this.controls.on('rotatePlayerTo', angle => this.player.setPlayerRotation(angle));
+    this.controls.on('rotatePlayerStart', direction => this.player.startRotation(direction));
+    this.controls.on('rotatePlayerStop', () => this.player.stopRotation());
+    this.controls.on('usedWarpCore', () => {
+      const numWarpCores = this.player.useWarpCore();
+      console.log(numWarpCores);
+      this.ui.updateWarpCoreCount(numWarpCores);
+      this.player.returnToCenter();
+    });
   }
 }
