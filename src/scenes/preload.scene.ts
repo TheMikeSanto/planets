@@ -34,6 +34,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.audio('launch', 'assets/audio/launch.wav');
     this.load.audio('low-bump', 'assets/audio/low-bump.wav');
     this.load.audio('plop', 'assets/audio/plop.wav');
+    this.load.audio('warp', 'assets/audio/warp.wav');
     this.load.on('complete', () => {
       console.log('complete');
       this.scene.start('titleScene');

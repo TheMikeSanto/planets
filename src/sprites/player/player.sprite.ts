@@ -29,6 +29,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     collectionBottom: Phaser.Sound.BaseSound,
     collectionTop: Phaser.Sound.BaseSound,
     crash: Phaser.Sound.BaseSound,
+    warp: Phaser.Sound.BaseSound,
   };
   private startPosition;
   private warpCoreCount = 3;
@@ -47,6 +48,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
       collectionBottom: scene.sound.add('low-bump'),
       collectionTop: scene.sound.add('plop'),
       crash: scene.sound.add('crash'),
+      warp: scene.sound.add('warp'),
     }
     scene.anims.create({
       key: 'ship-open',
@@ -97,10 +99,10 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   public returnToCenter(): void {
     this.isReturningToCenter = true;
     (<Phaser.Physics.Arcade.Body> this.body).setVelocity(0, 0);
-    this.scene.physics.moveTo(this, this.startPosition.x, this.startPosition.y, 200, 1000)
+    this.scene.physics.moveTo(this, this.startPosition.x, this.startPosition.y, 200, 500)
     this.scene.time.addEvent({
       callback: () => this.isReturningToCenter = false,
-      delay: 1000,
+      delay: 500,
     });
   }
 
@@ -169,6 +171,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   public useWarpCore(): number {
     this.warpCoreCount = --this.warpCoreCount || 0;
     this.debris.addWarpCore();
+    this.sounds.warp.play();
     return this.warpCoreCount;
   }
 
@@ -204,7 +207,6 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
    * @param source source of debris that was collected
    */
   private maybePlayCollectionAudio(source: DebrisSource): void {
-    if (SETTINGS.disableAudio) return;
     (source === DebrisSource.Bottom 
       ? this.sounds.collectionBottom
       : this.sounds.collectionTop).play();
