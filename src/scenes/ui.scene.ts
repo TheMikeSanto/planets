@@ -73,7 +73,7 @@ export class UiScene extends Phaser.Scene {
    */
   private initTouchGravActionToggleButton(): Phaser.GameObjects.Arc {
     const { height, width } = this.scale;
-    const gravActionToggleButton = this.add.circle(90, height/2, 50, SETTINGS.colors.gravBeam.pull[0], 0.2)
+    const gravActionToggleButton = this.add.circle(70, height/2 + 120, 50, SETTINGS.colors.gravBeam.pull[0], 0.2)
       .setScale(1)
       .setInteractive({ useHandCursor: true })
       .on('pointerdown', () => {
