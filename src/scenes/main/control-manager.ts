@@ -19,6 +19,7 @@ export class ControlManager {
   private player: PlayerSprite;
   private scene: Phaser.Scene;
   private ui: UiScene;
+  private isTouchEnabled: Boolean;
 
   constructor(player: PlayerSprite, ui: UiScene) {
     this.player = player;
@@ -34,6 +35,8 @@ export class ControlManager {
     this.registerKeyboardListeners();
     this.registerCursorInputListeners();
     this.registerTouchInputListeners();
+    this.isTouchEnabled = !this.scene.sys.game.device.os.desktop; // TODO: extract this out somewhere? it's repeated elsewhere twice. also might need to be more specific w/ how it's derived
+
   }
 
   public on(event: string, callback: Function): void {
@@ -55,8 +58,11 @@ export class ControlManager {
 
   private registerCursorInputListeners(): void {
     this.scene.input.on('pointerdown', pointer => {
-      if (pointer.rightButtonDown()) this.emit('gravBeamStart', ActionType.Push);
-      if (pointer.leftButtonDown()) this.emit('gravBeamStart', ActionType.Pull);
+      if (!this.isTouchEnabled) {
+        // TODO: this smells
+        if (pointer.rightButtonDown()) this.emit('gravBeamStart', ActionType.Push);
+        if (pointer.leftButtonDown()) this.emit('gravBeamStart', ActionType.Pull);
+      }
     });
     this.scene.input.on('pointerup', () => this.emit('gravBeamStop'));
     this.scene.input.on('pointermove', () => {
@@ -67,15 +73,18 @@ export class ControlManager {
   }
 
   private registerTouchInputListeners(): void {
+    this.scene.input.addPointer(1); // register for multitouch events
     this.ui.events.on('setGravActionPushButton', () => this.emit('setGravAction', ActionType.Push));
     this.ui.events.on('setGravActionPullButton', () => this.emit('setGravAction', ActionType.Pull));
     this.ui.events.on('usedWarpCoreButton', () => this.emit('usedWarpCore'));
+    this.scene.input.on('pointerdown', () => {
+      // TODO: this smells
+      if (this.isTouchEnabled) this.emit('gravBeamStart');
+    });
   }
 
   private registerKeyboardListeners(): void {
-    // TODO: Remove this - just for testing 
-    // this.keys.w.on('down', () => this.emit('gravBeamStart', ActionType.Push));
-    this.keys.w.on('down', () => this.emit('gravBeamStart'));
+    this.keys.w.on('down', () => this.emit('gravBeamStart', ActionType.Push));
     this.keys.w.on('up', () => this.emit('gravBeamStop'));
     this.keys.s.on('down', () => this.emit('gravBeamStart', ActionType.Pull));
     this.keys.s.on('up', () => this.emit('gravBeamStop'));
