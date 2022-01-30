@@ -3,7 +3,7 @@ import * as Phaser from 'phaser';
 import { DebrisManager } from '../debris';
 import { SETTINGS } from '../settings.config';
 import {
-  PlanetTileSprite,
+  PlanetSprite,
   PlayerSprite,
 } from '../sprites';
 
@@ -28,14 +28,12 @@ export class MainScene extends Phaser.Scene {
     this.cameras.main.fadeIn(2000);
     const { height, width } = this.scale;
     this.cameras.main.centerOn(width * 0.5, height * 0.5);
-    this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'starfield');
-    this.cloudLayer = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 520, 'clouds');
+    this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 600, 'starfield');
+    this.cloudLayer = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 600, 'clouds');
     this.planets = this.add.group([
-      new PlanetTileSprite(this, 20, 'planet1', SETTINGS.colors.planets.top),
-      new PlanetTileSprite(this, height - 20, 'planet1', SETTINGS.colors.planets.bottom),
+      new PlanetSprite(this, -4100, SETTINGS.colors.planets.top),
+      new PlanetSprite(this, height + 4075, SETTINGS.colors.planets.bottom),
     ]);
-    this.bigPlanet = this.add.sprite(width * 0.5, -4450, 'big-planet')
-      .setScale(10);
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
     const collider = this.physics.add.collider(this.player, this.planets, (player, planet) => {
       collider.destroy();
@@ -60,10 +58,11 @@ export class MainScene extends Phaser.Scene {
     this.scoreCounter.setText(`${this.distanceScore} km`);
     this.starField.tilePositionX += scrollFactor / 5;
     this.cloudLayer.tilePositionX += scrollFactor / 4;
-    this.planets.getChildren().forEach(planet => {
-      (<Phaser.GameObjects.TileSprite> planet).tilePositionX += scrollFactor;
+    this.planets.getChildren().forEach((planet, index) => {
+      index
+        ? (<Phaser.GameObjects.Sprite> planet).rotation -= scrollFactor / 20000
+        : (<Phaser.GameObjects.Sprite> planet).rotation += scrollFactor / 20000
     });
-    this.bigPlanet.rotation += scrollFactor / 1000;
     this.drawTrajectory();
     this.player.update();
   }
