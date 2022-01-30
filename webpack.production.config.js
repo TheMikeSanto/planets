@@ -1,6 +1,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const CopyPlugin = require("copy-webpack-plugin");
 
 // Phaser webpack config
@@ -50,6 +51,13 @@ module.exports = {
         removeEmptyAttributes: true
       },
       hash: true
+    }),
+    new WebpackManifestPlugin({
+      seed: {
+        "display":      "fullscreen",
+        "orientation":  "landscape"
+      },
+      filter: () => false,
     })
   ],
   module: {
