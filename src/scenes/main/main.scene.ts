@@ -109,11 +109,9 @@ export class MainScene extends Phaser.Scene {
     this.controls.on('rotatePlayerTo', angle => this.player.setPlayerRotation(angle));
     this.controls.on('rotatePlayerStart', direction => this.player.startRotation(direction));
     this.controls.on('rotatePlayerStop', () => this.player.stopRotation());
-    this.controls.on('usedWarpCore', () => {
+    this.controls.on('useWarpCore', () => {
       const numWarpCores = this.player.useWarpCore();
-      console.log(numWarpCores);
       this.ui.updateWarpCoreCount(numWarpCores);
-      this.player.returnToCenter();
     });
   }
 }

@@ -36,8 +36,6 @@ export class ControlManager {
     this.events.on(event, callback);
   }
 
-  // emit an event for grav gun begin/start
-  // emit an event for rotation
   private emit(event: string, args?): void {
     this.events.emit(event, args);
   }
@@ -70,7 +68,7 @@ export class ControlManager {
     this.keys.w.on('up', () => this.emit('gravBeamStop'));
     this.keys.s.on('down', () => this.emit('gravBeamStart', ActionType.Pull));
     this.keys.s.on('up', () => this.emit('gravBeamStop'));
-    this.keys.space.on('down', () => this.emit('usedWarpCore'));
+    this.keys.space.on('down', () => this.emit('useWarpCore'));
     this.keys.a.on('down', () => this.emit('rotatePlayerStart', RotationDirection.Left));
     this.keys.a.on('up', () => this.emit('rotatePlayerStop'));
     this.keys.d.on('down', () => this.emit('rotatePlayerStart', RotationDirection.Right));
