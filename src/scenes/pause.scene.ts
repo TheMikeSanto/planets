@@ -30,6 +30,7 @@ export class PauseScene extends Phaser.Scene {
 
   public create(): void {
     const { width, height } = this.scale;
+    this.scene.bringToTop(this);
     this.menuBox = this.createMenuBox(width / 2, height / 2);
     this.createButtons([
       {
@@ -116,6 +117,7 @@ export class PauseScene extends Phaser.Scene {
    * Handles pressing of the resume button.
    */
   private onResume(): void {
+    this.game.scene.bringToTop('uiScene');
     this.game.scene.resume('mainScene');
     this.game.scene.stop('pauseScene');
   }

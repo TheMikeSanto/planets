@@ -6,6 +6,7 @@ import {
   PlanetSprite,
   PlayerSprite,
 } from '../sprites';
+import { UiScene } from './ui.scene';
 
 export class MainScene extends Phaser.Scene {
   private backgroundMusic: Phaser.Sound.BaseSound;
@@ -13,19 +14,20 @@ export class MainScene extends Phaser.Scene {
   private crashed = false;
   private distanceScore: number = 0;
   private player: PlayerSprite;
-  private scoreCounter: Phaser.GameObjects.Text;
   private starField: Phaser.GameObjects.TileSprite;
   private cloudLayer: Phaser.GameObjects.TileSprite;
   private planets: Phaser.GameObjects.Group;
-  private bigPlanet: Phaser.GameObjects.Sprite;
   private trajectory: Phaser.Curves.Path;
   private graphics: Phaser.GameObjects.Graphics;
+  private ui: UiScene;
 
-  constructor () {
+  constructor (uiScene: UiScene) {
     super('mainScene');
+    this.ui = uiScene;
   }
 
   public create(): void {
+    this.scene.launch('uiScene');
     this.crashed = false;
     this.cameras.main.fadeIn(2000);
     const { height, width } = this.scale;
@@ -45,8 +47,7 @@ export class MainScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
     this.distanceScore = 0;
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
-    this.scoreCounter = this.initScoreCounter(height - 22);
-    this.initMenuButton();
+    this.ui.events.on('menuButtonClicked', () => this.scene.pause());
     this.debrisManager = new DebrisManager(this, this.player, this.planets);
     this.debrisManager.start();
     this.backgroundMusic = this.sound.add('background-music', { volume: 0.5 })
@@ -57,7 +58,7 @@ export class MainScene extends Phaser.Scene {
     if (this.crashed) return;
     const scrollFactor = 1;
     this.distanceScore += scrollFactor;
-    this.scoreCounter.setText(`${this.distanceScore} km`);
+    this.ui.updateScore(this.distanceScore);
     this.starField.tilePositionX += scrollFactor / 5;
     this.cloudLayer.tilePositionX += scrollFactor / 4;
     this.planets.getChildren().forEach((planet, index) => {
@@ -76,6 +77,7 @@ export class MainScene extends Phaser.Scene {
     this.crashed = true;
     this.player.showCrash();
     if (!SETTINGS.disableFailure) {
+      this.scene.sendToBack('uiScene');
       this.cameras.main.pan(this.player.position.x, this.player.position.y, 2000);
       this.cameras.main.zoomTo(4, 3000);
       this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
@@ -95,37 +97,5 @@ export class MainScene extends Phaser.Scene {
     // Figure out gravity, calculate endpoint and decay curve here
     this.trajectory.lineTo(1200, this.player.position.y);
     this.trajectory.draw(this.graphics);
-  }
-
-  /**
-   * Creates a menu button and wires up event handlers.
-   */
-  private initMenuButton(): void {
-    const { height, width } = this.scale;
-    const pauseButton = this.add.sprite(width - 30, height - 20, 'menu')
-    .setScale(0.5)
-    .setTintFill(1)
-    .setTint(0xffffff)
-    .setInteractive({ useHandCursor: true })
-    .on('pointerover', () => pauseButton.setTint(0x7d7d7d))
-    .on('pointerout', () => pauseButton.setTint(0xffffff))
-    .on('pointerdown', () => {
-      this.scene.launch('pauseScene');
-      this.scene.sendToBack();
-      this.scene.pause();
-    });
-  }
-
-  private initScoreCounter(y: number): Phaser.GameObjects.Text {
-    const padding = 10;
-    const scoreCounterLabel = this.add.text(padding, y, 'Distance: ', {
-      fontFamily: 'ROGFonts',
-      fontSize: '24px',
-      
-    }).setOrigin(0, 0.5);
-    return this.add.text(scoreCounterLabel.width + padding, y, `${this.distanceScore}`, {
-      fontFamily: 'ROGFonts',
-      fontSize: '24px',
-    }).setOrigin(0, 0.5);
   }
 }

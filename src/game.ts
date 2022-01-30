@@ -8,6 +8,7 @@ import {
   PauseScene,
   PreloadScene,
   TitleScene,
+  UiScene,
 } from './scenes';
 
 const plugins = SETTINGS.debug
@@ -40,11 +41,13 @@ export namespace Planets {
       super(Game.config);
       this.sound.volume = 0.3;
       this.sound.mute = SETTINGS.disableAudio;
+      const uiScene = new UiScene();
       this.scene.add('pauseScene', new PauseScene());
       this.scene.add('preloadScene', new PreloadScene());
       this.scene.add('titleScene', new TitleScene());
-      this.scene.add('mainScene', new MainScene());
+      this.scene.add('mainScene', new MainScene(uiScene));
       this.scene.add('gameOverScene', new GameOverScene());
+      this.scene.add('uiScene', uiScene);
       this.scene.start('preloadScene');
     }
   }
