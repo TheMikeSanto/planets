@@ -23,6 +23,7 @@ export class MainScene extends Phaser.Scene {
   private trajectory: Phaser.Curves.Path;
   private graphics: Phaser.GameObjects.Graphics;
   private ui: UiScene;
+  private isTouchEnabled: Boolean;
 
   constructor (uiScene: UiScene) {
     super('mainScene');
@@ -42,6 +43,8 @@ export class MainScene extends Phaser.Scene {
       new PlanetSprite(this, height + 4075, SETTINGS.colors.planets.bottom, 50),
     ]);
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
+    this.isTouchEnabled = !this.sys.game.device.os.desktop;
+    if (this.isTouchEnabled) this.player.setCursorRotationSpeed(SETTINGS.gravityGun.touchRotationSpeed);
     const collider = this.physics.add.collider(this.player, this.planets, (player, planet) => {
       collider.destroy();
       this.doGameOver();

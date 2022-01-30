@@ -13,8 +13,6 @@ import {
   ProjectileSprite,
 } from '../grav-cannon';
 
-const ROTATION_SPEED = 1 * Math.PI; // radians/second
-
 export class PlayerSprite extends Phaser.GameObjects.Sprite {
   private crashed = false;
   private readonly debris: DebrisCollection = new DebrisCollection();
@@ -33,6 +31,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   };
   private startPosition;
   private warpCoreCount = 3;
+  private rotationSpeed:number  = SETTINGS.gravityGun.mouseCursorRotationSpeed;
 
   constructor(scene: Phaser.Scene, x, y) {
     super(scene, x, y, 'player', 4);
@@ -115,7 +114,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.rotation = Phaser.Math.Angle.RotateTo(
       this.rotation,
       angle,
-      ROTATION_SPEED * 0.01,
+      this.rotationSpeed * 0.01,
     );
   }
 
@@ -183,6 +182,14 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
     this.returnToCenter();
     this.sounds.warp.play();
     return this.warpCoreCount;
+  }
+
+  /**
+   * Set player sprite rotation speed on cursor inputs (mouse, touch)
+   * @param rotSpeed rotation speed (radians/s)
+   */
+  public setCursorRotationSpeed(rotSpeed: number): void {
+    this.rotationSpeed = rotSpeed;
   }
 
   private adjustRotation(direction: RotationDirection): void {
