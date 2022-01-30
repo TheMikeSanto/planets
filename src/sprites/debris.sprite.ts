@@ -53,9 +53,10 @@ export class DebrisSprite extends Phaser.GameObjects.Sprite {
    * @param type optional. type of debris.
    * @param source optional. debris source.
    */
-  constructor(scene: Phaser.Scene,y: number, type = DebrisType.Default,
+  constructor(scene: Phaser.Scene, y: number, x?: number, type = DebrisType.Default,
     source = randomEnum(DebrisSource)) {
-    super(scene, scene.scale.width + 100 + randomInRange(0, 75), y, _.sample(ASSET_KEYS[type]));
+    super(scene, x || (scene.scale.width + 100 + randomInRange(0, 75)), y,
+      _.sample(ASSET_KEYS[type]));
     this.debrisSource = source;
     this.debrisType = type;
     scene.physics.add.existing(this);

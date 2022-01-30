@@ -48,7 +48,8 @@ export class MainScene extends Phaser.Scene {
     this.physics.world.bounds.height = height - 80;
     this.graphics = this.add.graphics();
     this.distanceScore = 0;
-    this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
+    this.trajectory = new Phaser.Curves.Path(0, this.player.position.y);
+    this.drawTrajectory();
     this.controls = new ControlManager(this.player);
     this.registerControlHandlers();
     this.ui.events.on('menuButtonClicked', () => this.scene.pause());
@@ -70,7 +71,6 @@ export class MainScene extends Phaser.Scene {
         ? (<Phaser.GameObjects.Sprite> planet).rotation -= scrollFactor / 20000
         : (<Phaser.GameObjects.Sprite> planet).rotation += scrollFactor / 20000
     });
-    this.drawTrajectory();
     this.player.update();
   }
 

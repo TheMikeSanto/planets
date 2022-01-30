@@ -45,6 +45,7 @@ export class DebrisManager {
    * Begins debris spawning.
    */
   public start(): void {
+    this.spawnInitialDebris();
     this.spawnDebris(CONFIG.numDebrisOnStart);
     this.scene.time.addEvent({
       callback: () => this.spawnDebris(CONFIG.numDebrisPerInterval),
@@ -98,14 +99,25 @@ export class DebrisManager {
   }
 
   /**
+   * Spawns an initial cloud of debris at random locations around the play field.
+   */
+  private spawnInitialDebris(): void {
+    this.spawnDebris(3, DebrisType.Default, randomInRange(400, 600));
+    this.spawnDebris(3, DebrisType.Default, randomInRange(600, 700))
+    this.spawnDebris(3 , DebrisType.Default, randomInRange(700, 800));
+    this.spawnDebris(3, DebrisType.Default, randomInRange(800, 1000));
+  }
+
+  /**
    * Creates the given number of debris objects and registers appropriate physics colliders.
    *
    * @param numDebris number of debris objects to spawn
    * @param debrisType optional. specifies the type of debris to spawn
+   * @param x optional. specifies the x position for the debris.
    */
-  private spawnDebris(numDebris: number, debrisType = DebrisType.Default): void {
+  private spawnDebris(numDebris: number, debrisType = DebrisType.Default, x?: number): void {
     [...Array(numDebris)].map(() => {
-      const debris = new DebrisSprite(this.scene, randomInRange(80, 500), debrisType);
+      const debris = new DebrisSprite(this.scene, randomInRange(80, 500), x, debrisType);
       this.group.add(debris);
       this.registerPlayerCollider(debris);
     });
