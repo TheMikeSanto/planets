@@ -5,11 +5,30 @@ import {
   DebrisType,
 } from '../debris';
 export class PreloadScene extends Phaser.Scene {
+
   constructor() {
     super('preloadScene');
   }
 
   public preload(): void {
+    const { width, height } = this.scale;
+    const loadingIndicator = this.add.text(width / 2, height / 2, 'loading', {
+      font: 'bold 24px Arial',
+    }).setAlpha(0);
+    this.tweens.add({
+      targets: loadingIndicator,
+      alpha: { value: 1, duration: 1000, ease: 'Power1' },
+      yoyo: true,
+      loop: -1,
+    });
+    this.loadAssets();
+    this.load.on('complete', () => {
+      console.log('complete');
+      this.scene.start('titleScene');
+    });
+  }
+
+  private loadAssets(): void {
     ASSET_KEYS[DebrisType.Default].forEach(key => {
       this.load.image(key, `assets/debris/${key}.png`);
     });
@@ -35,9 +54,5 @@ export class PreloadScene extends Phaser.Scene {
     this.load.audio('low-bump', 'assets/audio/low-bump.wav');
     this.load.audio('plop', 'assets/audio/plop.wav');
     this.load.audio('warp', 'assets/audio/warp.wav');
-    this.load.on('complete', () => {
-      console.log('complete');
-      this.scene.start('titleScene');
-    });
   }
 }
