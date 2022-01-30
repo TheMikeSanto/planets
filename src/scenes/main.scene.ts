@@ -10,6 +10,7 @@ import {
 export class MainScene extends Phaser.Scene {
   private backgroundMusic: Phaser.Sound.BaseSound;
   private debrisManager: DebrisManager;
+  private crashed = false;
   private distanceScore: number = 0;
   private player: PlayerSprite;
   private scoreCounter: Phaser.GameObjects.Text;
@@ -25,6 +26,7 @@ export class MainScene extends Phaser.Scene {
   }
 
   public create(): void {
+    this.crashed = false;
     this.cameras.main.fadeIn(2000);
     const { height, width } = this.scale;
     this.cameras.main.centerOn(width * 0.5, height * 0.5);
@@ -42,7 +44,6 @@ export class MainScene extends Phaser.Scene {
     this.physics.world.bounds.height = height - 80;
     this.graphics = this.add.graphics();
     this.distanceScore = 0;
-
     this.trajectory = new Phaser.Curves.Path(this.player.position.x, this.player.position.y);
     this.scoreCounter = this.initScoreCounter(height - 22);
     this.initMenuButton();
@@ -53,6 +54,7 @@ export class MainScene extends Phaser.Scene {
   }
 
   public update(): void {
+    if (this.crashed) return;
     const scrollFactor = 1;
     this.distanceScore += scrollFactor;
     this.scoreCounter.setText(`${this.distanceScore} km`);
@@ -71,6 +73,7 @@ export class MainScene extends Phaser.Scene {
    * Shows the game over sequence.
    */
   private doGameOver(): void {
+    this.crashed = true;
     this.player.showCrash();
     if (!SETTINGS.disableFailure) {
       this.cameras.main.pan(this.player.position.x, this.player.position.y, 2000);
