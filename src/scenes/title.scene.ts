@@ -14,9 +14,10 @@ export class TitleScene extends Phaser.Scene {
 
     this.add.image(width / 2, height / 2, 'title-screen-background')
       .setInteractive({ useHandCursor: true })
-      .on('pointerdown', () => {
+      .on('pointerup', () => {
         launchSound.play();
         this.scene.start('mainScene');
+        if (!this.sys.game.device.os.desktop) this.scale.startFullscreen();
       });
     this.clickToStartText = this.add.text(420, 400, 'click to start', {
       fontFamily: 'ROGFonts',
