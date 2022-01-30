@@ -35,18 +35,14 @@ export class CreditsScene extends Phaser.Scene {
  */
   private showCredits(x: number, y: number): Phaser.GameObjects.Rectangle {
     const menuBox = this.add.rectangle(x , y, CONFIG.menuWidth, CONFIG.menuHeight,
-      SETTINGS.colors.planets.bottom);
-    menuBox.setStrokeStyle(2, SETTINGS.colors.planets.top);
+      0x5f5f5f);
+    menuBox.setStrokeStyle(8, SETTINGS.colors.planets.top);
     const menuTopCenter = menuBox.getTopCenter();
-    const fontStyle = {
-      stroke: '#000000',
-      strokeThickness: 4,
-    };
     const title = this.add.text(menuTopCenter.x, menuTopCenter.y + CONFIG.padding, 'Credits',
-      { font: '48px ROGFonts', ...fontStyle })
+      { font: '72px ROGFonts' })
       .setOrigin(0.5, 0);
     const subtitle = this.add.text(menuTopCenter.x, title.getBottomCenter().y + CONFIG.padding,
-      'Created by', { font: '24px ROGFonts', ...fontStyle })
+      'Created by', { font: '64px ROGFonts' })
       .setOrigin(0.5, 0)
     const credits = this.add.text(menuTopCenter.x, subtitle.getBottomCenter().y + CONFIG.padding,
       [
@@ -54,7 +50,9 @@ export class CreditsScene extends Phaser.Scene {
         'Ryan McDermott',
         'Mike Santo',
         'Chris Seidholz',
-      ], { font: '16px ROGFonts', ...fontStyle }).setOrigin(0.5, 0);
+      ], { font: '48px ROGFonts' })
+      .setOrigin(0.5, 0)
+      .setAlign('center');
     return menuBox;
   }
 }
