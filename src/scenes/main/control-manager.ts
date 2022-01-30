@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { UiScene } from '..';
 
 import { ActionType } from '../../sprites/grav-cannon';
 import {
@@ -17,9 +18,11 @@ export class ControlManager {
   };
   private player: PlayerSprite;
   private scene: Phaser.Scene;
+  private ui: UiScene;
 
-  constructor(player: PlayerSprite) {
+  constructor(player: PlayerSprite, ui: UiScene) {
     this.player = player;
+    this.ui = ui;
     this.scene = this.player.scene;
     this.keys = {
       w: this.scene.input.keyboard.addKey('W'),
@@ -29,7 +32,8 @@ export class ControlManager {
       space: this.scene.input.keyboard.addKey('SPACE'),
     };
     this.registerKeyboardListeners();
-    this.registerInputListeners();
+    this.registerCursorInputListeners();
+    this.registerTouchInputListeners();
   }
 
   public on(event: string, callback: Function): void {
@@ -49,7 +53,7 @@ export class ControlManager {
       this.scene.input.x, this.scene.input.y);
   }
 
-  private registerInputListeners(): void {
+  private registerCursorInputListeners(): void {
     this.scene.input.on('pointerdown', pointer => {
       if (pointer.rightButtonDown()) this.emit('gravBeamStart', ActionType.Push);
       if (pointer.leftButtonDown()) this.emit('gravBeamStart', ActionType.Pull);
@@ -62,9 +66,16 @@ export class ControlManager {
     })
   }
 
+  private registerTouchInputListeners(): void {
+    this.ui.events.on('setGravActionPushButton', () => this.emit('setGravAction', ActionType.Push));
+    this.ui.events.on('setGravActionPullButton', () => this.emit('setGravAction', ActionType.Pull));
+    this.ui.events.on('usedWarpCoreButton', () => this.emit('usedWarpCore'));
+  }
+
   private registerKeyboardListeners(): void {
-    this.keys.w.on('down', () => console.log('key'));
-    this.keys.w.on('down', () => this.emit('gravBeamStart', ActionType.Push));
+    // TODO: Remove this - just for testing 
+    // this.keys.w.on('down', () => this.emit('gravBeamStart', ActionType.Push));
+    this.keys.w.on('down', () => this.emit('gravBeamStart'));
     this.keys.w.on('up', () => this.emit('gravBeamStop'));
     this.keys.s.on('down', () => this.emit('gravBeamStart', ActionType.Pull));
     this.keys.s.on('up', () => this.emit('gravBeamStop'));

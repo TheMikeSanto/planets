@@ -8,6 +8,7 @@ import {
   PlayerSprite,
 } from '../../sprites';
 import { UiScene } from '../ui.scene';
+import { ActionType } from '@sprites/grav-cannon';
 
 export class MainScene extends Phaser.Scene {
   private backgroundMusic: Phaser.Sound.BaseSound;
@@ -50,7 +51,7 @@ export class MainScene extends Phaser.Scene {
     this.distanceScore = 0;
     this.trajectory = new Phaser.Curves.Path(0, this.player.position.y);
     this.drawTrajectory();
-    this.controls = new ControlManager(this.player);
+    this.controls = new ControlManager(this.player, this.ui);
     this.registerControlHandlers();
     this.ui.events.on('menuButtonClicked', () => this.scene.pause());
     this.debrisManager = new DebrisManager(this, this.player, this.planets);
@@ -104,12 +105,13 @@ export class MainScene extends Phaser.Scene {
   }
 
   private registerControlHandlers(): void {
+    this.controls.on('setGravAction', actionType => this.player.setGravCannonAction(actionType));
     this.controls.on('gravBeamStart', actionType => this.player.startGravityCannon(actionType));
     this.controls.on('gravBeamStop', () => this.player.stopGravityCannon());
     this.controls.on('rotatePlayerTo', angle => this.player.setPlayerRotation(angle));
     this.controls.on('rotatePlayerStart', direction => this.player.startRotation(direction));
     this.controls.on('rotatePlayerStop', () => this.player.stopRotation());
-    this.controls.on('useWarpCore', () => {
+    this.controls.on('usedWarpCore', () => {
       const numWarpCores = this.player.useWarpCore();
       this.ui.updateWarpCoreCount(numWarpCores);
     });

@@ -1,3 +1,5 @@
+import { SETTINGS } from '../settings.config';
+import { ActionType } from '@sprites/grav-cannon';
 import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
@@ -11,8 +13,10 @@ const CONFIG = {
 } as const;
 export class UiScene extends Phaser.Scene {
   private menuButton: Phaser.GameObjects.Sprite;
+  private gravActionToggleButton: Phaser.GameObjects.Arc;
   private scoreCounter: CounterWithLabel;
   private warpCores: Phaser.GameObjects.Sprite[];
+  private isTouchEnabled: Boolean;
 
   constructor() {
     super('uiScene');
@@ -24,6 +28,8 @@ export class UiScene extends Phaser.Scene {
     this.menuButton = this.initMenuButton();
     this.scoreCounter = this.initScoreCounter(height - 22);
     this.warpCores = this.initWarpCores(this.scoreCounter.counter.getTopCenter().y - 20);
+    this.isTouchEnabled = !this.sys.game.device.os.desktop; // TODO: extract this out somewhere? it's repeated elsewhere once. also might need to be more specific w/ how it's derived
+    if (this.isTouchEnabled) this.initTouchControls();
   }
 
   public updateScore(score: number): void {
@@ -57,6 +63,31 @@ export class UiScene extends Phaser.Scene {
     return menuButton;
   }
 
+
+  private initTouchControls(): void {
+    this.gravActionToggleButton = this.initTouchGravActionToggleButton();
+  }
+
+  /**
+   * Creates a transparent button to toggle Gravity Gun Action.
+   */
+  private initTouchGravActionToggleButton(): Phaser.GameObjects.Arc {
+    const { height, width } = this.scale;
+    const gravActionToggleButton = this.add.circle(90, height/2, 50, SETTINGS.colors.gravBeam.pull[0], 0.2)
+      .setScale(1)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => {
+        gravActionToggleButton.fillColor = SETTINGS.colors.gravBeam.push[0]
+        this.events.emit('setGravActionPushButton');
+      })
+      .on('pointerup', () => {
+        gravActionToggleButton.fillColor = SETTINGS.colors.gravBeam.pull[0]
+        this.events.emit('setGravActionPullButton');
+      })
+    return gravActionToggleButton;
+  }
+
+
   private initScoreCounter(y: number): CounterWithLabel {
     const style = {
       fontFamily: 'ROGFonts',
@@ -80,6 +111,13 @@ export class UiScene extends Phaser.Scene {
     const first = createSprite(30);
     const second = createSprite(first.getRightCenter().x + CONFIG.padding);
     const third = createSprite(second.getRightCenter().x + CONFIG.padding)
-    return [ first, second, third ];
+
+    const cores = [ first, second, third ];
+    // TODO: Why isn't this firing? also tried putting it in createSprite
+    // cores.forEach(core => 
+    //   core.on('pointerup', () => {
+    //   this.events.emit('usedWarpCoreButton');
+    // }));
+    return cores;
   }
 }
