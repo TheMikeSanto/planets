@@ -13,6 +13,7 @@ const CONFIG = {
 } as const;
 export class UiScene extends Phaser.Scene {
   private menuButton: Phaser.GameObjects.Sprite;
+  private fullscreenButton: Phaser.GameObjects.Sprite;
   private gravActionToggleButton: Phaser.GameObjects.Arc;
   private scoreCounter: CounterWithLabel;
   private warpCores: Phaser.GameObjects.Sprite[];
@@ -26,6 +27,7 @@ export class UiScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.scene.bringToTop(this);
     this.menuButton = this.initMenuButton();
+    this.fullscreenButton = this.initFullscreenButton();
     this.scoreCounter = this.initScoreCounter(height - 22);
     this.warpCores = this.initWarpCores(this.scoreCounter.counter.getTopCenter().y - 20);
     this.isTouchEnabled = !this.sys.game.device.os.desktop; // TODO: extract this out somewhere? it's repeated elsewhere once. also might need to be more specific w/ how it's derived
@@ -62,6 +64,30 @@ export class UiScene extends Phaser.Scene {
       });
     return menuButton;
   }
+
+  /**
+   * Creates a menu button and wires up event handlers.
+   */
+     private initFullscreenButton(): Phaser.GameObjects.Sprite {
+      const { height, width } = this.scale;
+      const fullscreenButton = this.add.sprite(width - 20, 40, 'fullscreen-button')
+        .setScale(0.7)
+        .setTintFill(1)
+        .setTint(0xffffff)
+        .setAlpha(0.7)
+        .setInteractive({ useHandCursor: true })
+        .on('pointerover', () => fullscreenButton.setTint(0x7d7d7d))
+        .on('pointerout', () => fullscreenButton.setTint(0xffffff))
+        .on('pointerdown', () => {
+          this.events.emit('fullscreenButtonClicked');
+          if (!this.scale.isFullscreen) {
+            this.scale.startFullscreen();
+          } else {
+            this.scale.stopFullscreen();
+          }
+        });
+      return fullscreenButton;
+    }
 
 
   private initTouchControls(): void {
