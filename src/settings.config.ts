@@ -7,7 +7,7 @@ export const SETTINGS = {
       pull: [0xff3d3d, 0xff7a7a],
     },
     planets: {
-      bottom: 0x2a24ee,
+      bottom: 0x1C4EF3,
       top: 0xffffff,
     }
   },
