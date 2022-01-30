@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as Phaser from 'phaser';
 
+import { SETTINGS } from '../settings.config';
 import { PlayerSprite } from '../sprites';
 
 type Scores = {
@@ -73,24 +74,48 @@ export class GameOverScene extends Phaser.Scene {
    */
   private drawScoreboard(): void {
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
-    this.add.text(screenCenterX, 100, 'GAME OVER', { fontSize: '72px', fontFamily: 'ROGFonts '})
-      .setOrigin(0.5);
-    this.add.text(screenCenterX, 200, [
-      `Distance: ${this.scores.distance} km`,
-      `Mass (bottom): ${this.scores.mass.bottom} tons`,
-      `Mass (top): ${this.scores.mass.top} tons`
-    ], {
-      fontSize: '32px',
-      fontFamily: 'Arial',
-      align: 'left',
+    this.add.text(screenCenterX, 100, 'GAME OVER', {
+      fontSize: '72px',
+      fontFamily: 'ROGFonts',
+      stroke: '#000000',
+      strokeThickness: 4,
     }).setOrigin(0.5);
-    this.add.text(screenCenterX, 300, `TOTAL: ${this.scores.total}`, {
+    this.add.text(screenCenterX, 200, `Distance: ${this.scores.distance} km`,
+      {
+        fontSize: '32px',
+        fontFamily: 'Arial',
+        align: 'left',
+        stroke: '#000000',
+        strokeThickness: 4,
+      }).setOrigin(0.5);
+    const debrisCounterFontStyle = {
+      font: 'bold 24px Arial',
+      stroke: '#000000',
+      strokeThickness: 4,
+    };
+    const topDebrisContainer = this.add.sprite(screenCenterX - 80, 275, 'debris1')
+      .setScale(0.5);
+    const topDebrisContainerCenter = topDebrisContainer.getCenter();
+    this.add.text(topDebrisContainerCenter.x, topDebrisContainerCenter.y,
+      `${this.scores.mass.top} kg`, debrisCounterFontStyle)
+      .setOrigin(0.5, 0.5);
+    const bottomDebrisContainer = this.add.sprite(screenCenterX + 80, 275, 'debris1')
+      .setTint(SETTINGS.colors.planets.bottom)
+      .setScale(0.5);
+    const bottomDebrisContainerCenter = bottomDebrisContainer.getCenter();
+    this.add.text(bottomDebrisContainerCenter.x, bottomDebrisContainerCenter.y,
+      `${this.scores.mass.bottom} kg`, debrisCounterFontStyle).setOrigin(0.5, 0.5);
+    this.add.text(screenCenterX, 400, `TOTAL: ${this.scores.total}`, {
       fontSize: '48px',
-      fontFamily: 'ROGFonts, Arial'
+      fontFamily: 'ROGFonts, Arial',
+      stroke: '#000000',
+      strokeThickness: 4,
     }).setOrigin(0.5);
     this.add.text(screenCenterX, this.scale.height - 40, 'Press any button to continue', {
       fontSize: '16px',
       fontFamily: 'ROGFonts, Arial',
+      stroke: '#000000',
+      strokeThickness: 4,
     }).setOrigin(0.5);
   }
 
