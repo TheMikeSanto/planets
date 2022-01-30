@@ -169,6 +169,7 @@ export class PlayerSprite extends Phaser.GameObjects.Sprite {
   }
 
   public useWarpCore(): number {
+    if (!this.warpCoreCount) return;
     this.warpCoreCount = --this.warpCoreCount || 0;
     this.debris.addWarpCore();
     this.sounds.warp.play();
