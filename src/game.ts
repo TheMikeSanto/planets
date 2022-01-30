@@ -3,6 +3,8 @@ import DebugDrawPlugin from 'phaser-plugin-debug-draw';
 
 import { SETTINGS } from './settings.config';
 import {
+  CreditsScene,
+  HelpScene,
   GameOverScene,
   MainScene,
   PauseScene,
@@ -42,6 +44,8 @@ export namespace Planets {
       this.sound.volume = 0.3;
       this.sound.mute = SETTINGS.disableAudio;
       const uiScene = new UiScene();
+      this.scene.add('creditsScene', new CreditsScene());
+      this.scene.add('helpScene', new HelpScene());
       this.scene.add('pauseScene', new PauseScene());
       this.scene.add('preloadScene', new PreloadScene());
       this.scene.add('titleScene', new TitleScene());

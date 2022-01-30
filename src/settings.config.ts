@@ -9,7 +9,8 @@ export const SETTINGS = {
     planets: {
       bottom: 0x1C4EF3,
       top: 0xffffff,
-    }
+    },
+    red: 0xf30000,
   },
   /** Enables debugging */
   debug: false,

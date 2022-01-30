@@ -51,7 +51,7 @@ export class UiScene extends Phaser.Scene {
   /**
    * Creates a menu button and wires up event handlers.
    */
-   private initMenuButton(): Phaser.GameObjects.Sprite {
+  private initMenuButton(): Phaser.GameObjects.Sprite {
     const { height, width } = this.scale;
     const menuButton = this.add.sprite(width - 30, height - 20, 'menu')
       .setScale(0.5)

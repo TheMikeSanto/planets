@@ -38,6 +38,10 @@ export class PauseScene extends Phaser.Scene {
         callback: menuButton => this.onMute(menuButton),
       },
       {
+        label: 'Controls',
+        callback: () => this.onShowControls(),
+      },
+      {
         label: 'Resume',
         callback: () => this.onResume(),
       },
@@ -95,7 +99,7 @@ export class PauseScene extends Phaser.Scene {
     const buttonStartY = this.menuBox.getTopCenter().y + 84 + CONFIG.padding;
     buttons.forEach((button, index) => {
       let y = buttonStartY + (CONFIG.buttonHeight * index)
-      if (index > 0) y += CONFIG.padding;
+      if (index > 0) y += (CONFIG.padding * index);
       const menuButton = this.createButton(buttonCenterX, y, button.label);
       menuButton.button.on('pointerdown', () => button.callback(menuButton));
     });
@@ -120,5 +124,12 @@ export class PauseScene extends Phaser.Scene {
     this.game.scene.bringToTop('uiScene');
     this.game.scene.resume('mainScene');
     this.game.scene.stop('pauseScene');
+  }
+
+  /**
+   * Handles pressing the controls button.
+   */
+  private onShowControls(): void {
+    this.scene.launch('helpScene');
   }
 }
