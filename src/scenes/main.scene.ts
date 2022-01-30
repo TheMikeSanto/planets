@@ -31,8 +31,8 @@ export class MainScene extends Phaser.Scene {
     this.starField = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 600, 'starfield');
     this.cloudLayer = this.add.tileSprite(width * 0.5, height * 0.5, 1200, 600, 'clouds');
     this.planets = this.add.group([
-      new PlanetSprite(this, -4100, SETTINGS.colors.planets.top),
-      new PlanetSprite(this, height + 4075, SETTINGS.colors.planets.bottom),
+      new PlanetSprite(this, -4100, SETTINGS.colors.planets.top, 25),
+      new PlanetSprite(this, height + 4075, SETTINGS.colors.planets.bottom, 50),
     ]);
     this.player = new PlayerSprite(this, 200, height / 2 - 10);
     const collider = this.physics.add.collider(this.player, this.planets, (player, planet) => {
