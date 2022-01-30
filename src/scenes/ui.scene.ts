@@ -15,6 +15,7 @@ export class UiScene extends Phaser.Scene {
   private menuButton: Phaser.GameObjects.Sprite;
   private fullscreenButton: Phaser.GameObjects.Sprite;
   private gravActionToggleButton: Phaser.GameObjects.Arc;
+  private warpCoreButton: Phaser.GameObjects.Rectangle;
   private scoreCounter: CounterWithLabel;
   private warpCores: Phaser.GameObjects.Sprite[];
   private isTouchEnabled: Boolean;
@@ -89,9 +90,25 @@ export class UiScene extends Phaser.Scene {
       return fullscreenButton;
     }
 
+  /**
+   * Creates a menu button and wires up event handlers.
+   */
+     private initWarpCoreButton(warpCoreX:number, warpCoreY:number, warpCoreWidth: number, warpCoreHeight: number): Phaser.GameObjects.Rectangle {
+      const warpCoreTotalAreaWidth = (warpCoreWidth * 3) + CONFIG.padding * 2;
+      const warpCoreButton = this.add.rectangle(warpCoreX, warpCoreY, warpCoreTotalAreaWidth, warpCoreHeight)
+        .setFillStyle(0xffffff)
+        .setAlpha(0.01)
+        .setInteractive()
+        .on('pointerdown', () => {
+          this.events.emit('usedWarpCoreButton');
+        });
+      return warpCoreButton;
+    }
+
 
   private initTouchControls(): void {
     this.gravActionToggleButton = this.initTouchGravActionToggleButton();
+    this.warpCoreButton = this.initWarpCoreButton(this.warpCores[0].x, this.warpCores[0].y, this.warpCores[0].displayWidth, this.warpCores[0].displayHeight);
   }
 
   /**
@@ -137,13 +154,6 @@ export class UiScene extends Phaser.Scene {
     const first = createSprite(30);
     const second = createSprite(first.getRightCenter().x + CONFIG.padding);
     const third = createSprite(second.getRightCenter().x + CONFIG.padding)
-
-    const cores = [ first, second, third ];
-    // TODO: Why isn't this firing? also tried putting it in createSprite
-    // cores.forEach(core => 
-    //   core.on('pointerup', () => {
-    //   this.events.emit('usedWarpCoreButton');
-    // }));
-    return cores;
+    return [ first, second, third ];
   }
 }
